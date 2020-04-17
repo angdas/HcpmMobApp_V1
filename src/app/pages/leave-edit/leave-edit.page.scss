@@ -1,0 +1,46 @@
+.text-right {
+    text-align: right;
+}
+
+ion-list-header {
+    background: #182771;
+}
+
+ion-list {
+    padding: 0px;
+    margin: 0px;
+}
+button:disabled{
+    opacity: .6;
+}
+.hours {
+    text-align: right;
+}
+
+ion-label {
+    opacity: 1 !important;
+    pointer-events: none;
+}
+.submitBtn {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: white;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    ion-icon {
+        font-size: 19px;
+        ;
+    }
+}
+
+
+::ng-deep  button.days-btn[disabled] p {
+    color: rgba(255, 255, 255, 0.32) !important;
+}
+::ng-deep button.days-btn p{
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+ion-item {
+    --highlight-color-focused: none;
+  }  

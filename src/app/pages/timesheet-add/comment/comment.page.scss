@@ -1,0 +1,27 @@
+
+ion-item{
+    --background: #fff;  
+    --border-color :#bdbdbd; 
+    --color:#3952a6;
+  }
+
+  ion-row > ion-button
+  {
+    --box-shadow:none; 
+    --background:none;
+    --color: #3952a6; 
+  }
+
+
+  ion-button
+  {
+    --box-shadow:none;
+    --background:#3952a6;
+    --color:#fff; 
+  }
+
+  ion-grid{
+    background-color: #fff;
+    border: solid  0px #fff;
+    border-radius: 20px;
+  }

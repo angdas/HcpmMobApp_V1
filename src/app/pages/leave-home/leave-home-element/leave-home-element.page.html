@@ -1,0 +1,113 @@
+<div *ngIf="pageType!='worker';else myWorkers">
+	<div class="leaveDetails" *ngIf="!leaveApp.IsDeleted">
+		<div class="period">
+			<span *ngIf="leaveApp.LeaveApplicationCode;else noLeaveCode">{{leaveApp.LeaveApplicationCode}}</span>
+			<ng-template #noLeaveCode>
+				<span>Not Synced</span>
+			</ng-template>
+			<!-- {{leaveApp.PeriodFrom | date:'LL/dd/yy'}} - {{leaveApp.PeriodTo | date:'LL/dd/yy'}} -->
+			<ion-fab *ngIf="(leaveApp.Status | uppercase) !='APPROVED'">
+				<ion-fab-button [disabled]="!leaveApp.IsEditable">
+					<ion-icon name="play"></ion-icon>
+				</ion-fab-button>
+				<ion-fab-list side="end">
+					<ion-fab-button color="success" (click)="submitLeave()">
+						<ion-icon name="checkmark"></ion-icon>
+					</ion-fab-button>
+
+					<ion-fab-button color="danger" (click)="deleteLeave()">
+						<ion-icon name="trash"></ion-icon>
+					</ion-fab-button>
+				</ion-fab-list>
+			</ion-fab>
+			<ion-fab *ngIf="(leaveApp.Status | uppercase) =='APPROVED' && !leaveApp.ResumptionInitiated">
+				<ion-fab-button>
+					<ion-icon name="play"></ion-icon>
+				</ion-fab-button>
+				<ion-fab-list side="end">
+
+					<ion-fab-button color="secondary" (click)="resumtion()">
+						<ion-icon name="fastforward"></ion-icon>
+					</ion-fab-button>
+				</ion-fab-list>
+			</ion-fab>
+		</div>
+
+
+		<ion-button fill="outline" [ngClass]="{'color-red': leaveApp.Status === 'RETURNED', 'color-blue': leaveApp.Status === 'CREATED',
+			'color-green': leaveApp.Status === 'APPROVED','color-grey': leaveApp.Status === 'SUBMITTED'} "
+			(click)="gotoLinePage(leaveApp)" *ngIf="!leaveApp.Resumed && !leaveApp.ResumptionInitiated"
+			class="statusBtn">
+			{{leaveApp.Status}}
+		</ion-button>
+
+		<ion-button fill="outline" (click)="gotoLinePage(leaveApp)" *ngIf="leaveApp.Resumed"
+			class="statusBtn color-green">
+			RESUMED
+		</ion-button>
+
+		<ion-button fill="outline" (click)="gotoLinePage(leaveApp)" *ngIf="leaveApp.ResumptionInitiated"
+			class="statusBtn color-green">
+			<span style="font-size: 10px;">Resumtion <br>Initiated</span>
+		</ion-button>
+
+
+		<div *ngFor="let leaveLine of leaveApp.LeaveApplicationLine;let i = index">
+			<ion-item-sliding>
+				<ion-item (click)="gotoLinePage(leaveApp)">
+					<ion-label>
+						<h2> {{leaveLine.StartDate | date:'LL/dd/yy'}} - {{leaveLine.EndDate | date:'LL/dd/yy'}} </h2>
+						<h2>{{leaveLine.AbsenceCodeDescription}}</h2>
+						<p>Days : {{leaveLine.LeaveApplied | number : '1.2-2' }} </p>
+						<p>Balance : {{leaveLine.Balance}} </p>
+					</ion-label>
+				</ion-item>
+
+				<ion-item-options side="end">
+					<ion-item-option color="danger" [disabled]="!leaveApp.IsEditable" style="width: 40px;"
+						(click)="deleteLine(i)">
+						<ion-icon slot="icon-only" name="trash"></ion-icon>
+					</ion-item-option>
+				</ion-item-options>
+			</ion-item-sliding>
+		</div>
+		<p *ngIf="leaveApp.Error" style="color: #f04141;">
+			{{leaveApp.ErrorMessage}}
+		</p>
+	</div>
+</div>
+
+<ng-template #myWorkers>
+	<!-- <div  class="workerCard"> -->
+		<!-- <p class="workerName"></p> -->
+		<div class="workerLeave" *ngIf="!leaveApp.InApprovalState">
+			<div class="leaveDetails">
+				<p class="period"> {{leaveApp.WorkerName}}</p>
+				<div class="changeStatusBtn">
+					<ion-button color="danger" (click)="rejectLeave()">
+						<ion-icon name="close"></ion-icon>
+					</ion-button>
+					<ion-button color="success" (click)="approveLeave()">
+						<ion-icon name="checkmark-circle-outline"></ion-icon>
+					</ion-button>
+				</div>
+				<div>
+					<p>{{leaveApp.LeaveApplicationCode}}</p>
+					<p>Status : {{leaveApp.Status}} </p>
+					
+					<div *ngFor="let leaveLine of leaveApp.LeaveApplicationLine">
+						<ion-item>
+							<ion-label>
+								<h2>{{leaveLine.AbsenceCodeDescription}}</h2>
+								<p>Date : {{leaveLine.ActualStartDate | date:'mediumDate'}}  - {{leaveLine.ActualEndDate | date:'mediumDate'}} </p>
+								<p>Days : {{leaveLine.LeaveApplied | number : '1.2-2' }}</p>
+								<p>Balance :  {{leaveLine.Balance  | number : '1.2-2' }} </p>
+								<p>Remarks : {{leaveLine.Remarks}} </p>
+							</ion-label>
+						</ion-item>
+					</div>
+				</div>
+			</div>
+		</div>
+	<!-- </div> -->
+</ng-template>

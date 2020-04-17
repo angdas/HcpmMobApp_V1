@@ -1,0 +1,85 @@
+
+button[disabled]{
+    opacity: .6;
+} 
+.projDetail{
+    padding: 8px 10px;
+    border: 1px solid var(--ion-color-light);
+    border-radius: 16px;
+    padding: 8px 10px;
+    background: white;
+    color: black;
+    p{
+        margin:0px;
+        margin-top: 5px !important;
+        font-size:14px;
+    }
+}
+
+td {
+    height: 70px;
+    text-align: center;
+    ;
+}
+
+ion-badge {
+    width: 85%;
+    background: #0043ffa6;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+th {
+    padding: 0;
+    font-weight: 450;
+}
+.margin-top{
+    margin-top: 16px;
+}
+.margin-bottom{
+    margin-bottom: 16px;
+}
+ion-content {
+    --padding-top: 10px !important;
+    --padding-bottom: 0px !important;
+    --padding-start: 5px !important;
+    --padding-end: 5px !important;
+}
+
+ion-col{
+    text-align: center;
+    font-size: 14px;
+}
+ion-row:not(:first-child){
+    height: 22px;
+}
+ion-col:first-child{
+    text-align: left;
+}   
+
+.nextIcon{
+    float: right;
+    font-size: 30px;
+    color: #2554a7
+}
+
+.expand{
+    float: right;
+    font-size: 16px;
+    position: relative;
+    top: -6px;
+    left: 6px;
+    color: #0062cc;
+    
+}
+.totalHrs{
+    background: white;
+    color: black;
+    padding: 4px 1px;
+    border-radius: 500px;
+    height: 20px;
+    width: 20px;
+}

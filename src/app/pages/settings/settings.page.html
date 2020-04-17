@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-title color="dark">Settings</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="margin:10px" *ngIf="!authenticated">
+    <ion-item>
+      <ion-label position="floating">Client Id</ion-label>
+      <ion-input type="text" [(ngModel)]="clientConfig.clientId" placeholder="Enter Client ID" #clientId></ion-input>
+    </ion-item>
+
+    <ion-list>
+      <ion-radio-group [(ngModel)]="clientConfig.instance">
+        <ion-item>
+          <ion-label>LIVE</ion-label>
+          <ion-radio slot="start" value="LIVE"></ion-radio>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>UAT</ion-label>
+          <ion-radio slot="start" value="UAT" checked></ion-radio>
+        </ion-item>
+
+      </ion-radio-group>
+    </ion-list>
+    <ion-button (click)="getClientUrl()" expand="block" style="margin-top: 16px;">
+      Submit
+    </ion-button>
+  </div>
+
+  <div *ngIf="!authenticated">
+
+  </div>
+
+  <p class="appVersion">Version : {{versionNumber}}</p>
+</ion-content>

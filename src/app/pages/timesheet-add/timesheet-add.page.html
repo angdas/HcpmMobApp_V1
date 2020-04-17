@@ -1,0 +1,83 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-title>Add Timesheet</ion-title>
+		<ion-buttons slot="start">
+			<ion-back-button></ion-back-button>
+		</ion-buttons>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<div style="margin: 16px;">
+
+		<ion-item class="itbr" (click)="presentModal()" lines="none">
+			<ng-container *ngIf="newLine.ProjId;else noProj">
+				<ion-input [readonly]="true" value=" {{ newLine.ProjId + ' ' + newLine.ProjDescription}}"></ion-input>
+			</ng-container>
+			<ng-template #noProj>
+				<ion-input placeholder="Select Project" [readonly]="true"></ion-input>
+			</ng-template>
+		</ion-item>
+
+
+		<ion-item class="itbr" lines="none">
+			<ion-select okText="Okay" cancelText="Dismiss" class="ion-text-wrap" interface="action-sheet"
+				placeholder="Select Activity" (ionChange)="activitySelected($event)">
+				<ion-select-option *ngFor="let activity of tsActivity" [value]="activity">
+					{{activity.ProjActivityDescription}}
+				</ion-select-option>
+			</ion-select>
+		</ion-item>
+	</div>
+
+	<table>
+		<tr>
+			<td *ngFor="let day of timesheetPeriodList;let i = index">
+				{{day.PeriodDate | date:'EEE dd/MM'}}
+				<ng-container *ngIf="!checkHrs( convert(i));else showPopup">
+					<ion-input type="number" placeholder="hr" maxlength="2" [(ngModel)]="newLine['Hours' + convert(i)]"
+						(keyup.enter)="onEnter( convert(i))"></ion-input>
+				</ng-container>
+
+				<ng-template #showPopup>
+					<ion-badge color="primary"
+						(click)="openComment($event,newLine['Hours' +  convert(i)],newLine['InternalComment' +  convert(i)],newLine['ExternalComment' +  convert(i)], convert(i))">
+						{{newLine['Hours' + convert(i)]}}
+					</ion-badge>
+				</ng-template>
+			</td>
+
+		</tr>
+	</table>
+
+	<ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="saveTimesheet()">
+		<ion-fab-button size="small">
+			<ion-icon name="save"></ion-icon>
+		</ion-fab-button>
+	</ion-fab>
+</ion-content>
+
+
+
+<!-- 
+	<ion-grid class="ion-padding-top">
+		<ion-row>
+			<ion-col *ngFor="let day of timesheetPeriodList;let i = index">
+				<div class="ion-text-center">
+					<ion-label> {{day.PeriodDate | date:'EEE dd/MM'}} </ion-label>
+
+					<ng-container *ngIf="!checkHrs( convert(i));else showPopup">
+						<ion-input placeholder="hr" maxlength="2" [(ngModel)]="newLine['Hours' + convert(i)]"
+							(keyup.enter)="onEnter( convert(i))"></ion-input>
+					</ng-container>
+
+					<ng-template #showPopup>
+						<ion-badge color="primary"
+							(click)="openComment($event,newLine['Hours' +  convert(i)],newLine['InternalComment' +  convert(i)],newLine['ExternalComment' +  convert(i)], convert(i))">
+							{{newLine['Hours' + convert(i)]}}
+						</ion-badge>
+					</ng-template>
+				</div>
+			</ion-col>
+		</ion-row>
+	</ion-grid> -->

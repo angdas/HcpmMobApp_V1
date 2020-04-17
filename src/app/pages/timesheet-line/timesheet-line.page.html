@@ -1,0 +1,57 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Timesheet Line</ion-title>
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div style="margin: 16px;">
+
+        <ion-item class="itbr" (click)="presentModal()" lines="none">
+            <ng-container *ngIf="tsLine.ProjId;else noProj">
+                <ion-input [readonly]="true" value=" {{ tsLine.ProjId + ' ' + tsLine.ProjDescription}}"></ion-input>
+            </ng-container>
+            <ng-template #noProj>
+                <ion-input placeholder="Project" [readonly]="true"></ion-input>
+            </ng-template>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-select okText="Okay" cancelText="Dismiss" placeholder="Activity" interface="action-sheet" [(ngModel)]="tsLine.ProjActivityId">
+                <ion-select-option *ngFor="let activity of tsActivity" [value]="activity.ProjActivityId">
+                    {{activity.ProjActivityDescription}}
+                </ion-select-option>
+            </ion-select>
+        </ion-item>
+        
+    </div>
+
+        <table>
+            <tr>
+                <td *ngFor="let day of timesheetPeriodList;let i = index">
+                    {{day.PeriodDate | date:'EEE dd/MM'}}
+                    <ng-container *ngIf="!checkHrs( convert(i));else showPopup">
+                        <ion-input type="number" placeholder="hr" maxlength="2" [(ngModel)]="tsLine['Hours' + convert(i)]"
+                            (keyup.enter)="onEnter( convert(i))"></ion-input>
+                    </ng-container>
+
+                    <ng-template #showPopup>
+                        <ion-badge color="primary"
+                            (click)="openComment($event,tsLine['Hours' +  convert(i)],tsLine['InternalComment' +  convert(i)],tsLine['ExternalComment' +  convert(i)], convert(i))">
+                            {{tsLine['Hours' + convert(i)]}}
+                        </ion-badge>
+                    </ng-template>
+                </td>
+
+            </tr>
+        </table>
+
+        <ion-fab horizontal="end" vertical="bottom" slot="fixed"  (click)="saveTimesheet()" >
+            <ion-fab-button size="small" [disabled]="!isEditable">
+                <ion-icon name="save"></ion-icon>
+            </ion-fab-button>
+        </ion-fab>
+</ion-content>

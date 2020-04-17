@@ -8,14 +8,42 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { StorageService } from './providers/storageService/storage.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ParameterService } from './providers/parameterService/parameter.service';
+import { DataService } from './providers/dataService/data.service';
+import { AxService } from './providers/axservice/ax.service';
+import { HttpClientModule } from '@angular/common/http';
+import { IonicStorageModule } from '@ionic/storage';
+import { File } from '@ionic-native/file/ngx';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { AppVersion } from '@ionic-native/app-version/ngx';
+import { Events } from './providers/events/event.service';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    IonicModule.forRoot({
+      hardwareBackButton: false
+    }),
+    IonicStorageModule.forRoot(),
+    AppRoutingModule,
+    BrowserAnimationsModule
+  ],
   providers: [
+    File,
+    AppVersion,
+    FileOpener,
     StatusBar,
     SplashScreen,
+    StorageService,
+    ParameterService,
+    DataService,
+    AxService,
+    Events,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

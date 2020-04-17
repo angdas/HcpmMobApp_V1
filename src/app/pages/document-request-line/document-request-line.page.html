@@ -1,0 +1,48 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>HR Request Line</ion-title>
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="pageType!='worker'">
+            <button class="submitBtn" (click)="saveLeave()" [disabled]="!documentApp.IsEditable">
+                <ion-icon name="save"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list *ngFor="let documentLine of documentApp.HRRequestLine">
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Request Type</ion-label>
+            <ion-select okText="Okay" cancelText="Dismiss" interface="action-sheet"
+                [selectedText]="documentLine.DocumentRequestTypeCode" [(ngModel)]="documentLine.DocumentRequestTypeCode"
+                [disabled]="!documentApp.IsEditable">
+                <ion-select-option *ngFor="let reqType of docRequestTypeList" [value]="reqType.HRRequestTypeCode">
+                    {{reqType.HRRequestTypeCode}} - {{reqType.Description}}
+                </ion-select-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Address Type</ion-label>
+            <ion-select okText="Okay" cancelText="Dismiss" interface="action-sheet"
+                [selectedText]="documentLine.DocumentRequestAddressCode"
+                [(ngModel)]="documentLine.DocumentRequestAddressCode" [disabled]="!documentApp.IsEditable">
+                <ion-select-option *ngFor="let reqAddress of docReqAddressTypeList"
+                    [value]="reqAddress.HRRequestAddressCode">
+                    {{reqAddress.HRRequestAddressCode}} - {{reqAddress.DocumentAddressTo}}
+                </ion-select-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Remarks</ion-label>
+            <ion-textarea [(ngModel)]="documentLine.Remarks" [disabled]="!documentApp.IsEditable">
+            </ion-textarea>
+        </ion-item>
+    </ion-list>
+</ion-content>

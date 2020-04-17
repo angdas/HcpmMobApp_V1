@@ -1,0 +1,57 @@
+.addButton {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: white;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    ion-icon {
+        font-size: 19px;
+        ;
+    }
+}
+button[disabled]{
+    opacity: .6;
+}
+.projDetail{
+    padding: 8px 10px;
+    border: 1px solid var(--ion-color-light);
+    border-radius: 16px;
+    background: white;
+    color: black;
+    padding: 8px 10px;
+    p{
+        margin:0px;
+        margin-top: 5px !important;
+        font-size:14px;
+    }
+}
+
+td {
+    border: 1px solid #bbb1b1;
+    height: 70px;
+    text-align: center;
+    ;
+}
+
+ion-badge {
+    width: 85%;
+    background: #0043ffa6;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+th {
+    padding: 0;
+    border: 1px solid #bbb7b7;
+    font-weight: 450;
+}
+.margin-top{
+    margin-top: 16px;
+}
+.margin-bottom{
+    margin-bottom: 16px;
+}

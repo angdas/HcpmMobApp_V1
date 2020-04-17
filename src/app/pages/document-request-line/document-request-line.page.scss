@@ -1,0 +1,36 @@
+.text-right {
+    text-align: right;
+}
+
+ion-list-header {
+    background: #ece9e9;
+}
+
+ion-list {
+    padding: 0px;
+    margin: 0px;
+}
+
+.hours {
+    text-align: right;
+}
+
+ion-label {
+    opacity: 1 !important;
+    pointer-events: none;
+}
+.submitBtn {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: white;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    ion-icon {
+        font-size: 19px;
+        ;
+    }
+}
+button[disabled]{
+    opacity: .6;
+}

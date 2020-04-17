@@ -1,0 +1,94 @@
+<ion-header>
+	<ion-toolbar class="toolbar">
+		<ion-title>Timesheet</ion-title>
+		<ion-buttons slot="start">
+			<ion-back-button></ion-back-button>
+		</ion-buttons>
+
+		<!-- 
+		<ion-buttons slot="end" *ngIf="pageType!='worker'">
+			<button class="addButton" (click)="addTimesheet()">
+				<ion-icon name="add"></ion-icon>
+			</button>
+		</ion-buttons> -->
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+		<ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles"
+			refreshingText="Refreshing...">
+		</ion-refresher-content>
+	</ion-refresher>
+
+	<div [hidden]="pageType=='worker'">
+
+		<ion-item class="ion-text-wrap itbr" sticky>
+			<ion-select interface="action-sheet" class="ion-text-wrap" placeholder="Period" [(ngModel)]="selectedPeriod"
+				(ionChange)="periodChanged($event)">
+				<ion-select-option *ngFor="let period of periodList" [value]="period">
+					{{period.PeriodFrom | date:'mediumDate'}} -
+					{{period.PeriodTo | date:'mediumDate'}}</ion-select-option>
+			</ion-select>
+		</ion-item>
+
+		<ion-segment [(ngModel)]="selectedTab">
+			<ion-segment-button value="all">
+				<ion-label>All</ion-label>
+			</ion-segment-button>
+			<ion-segment-button value="created">
+				<ion-label>Created</ion-label>
+			</ion-segment-button>
+			<ion-segment-button value="approved">
+				<ion-label>Approved</ion-label>
+			</ion-segment-button>
+			<ion-segment-button value="rejected">
+				<ion-label>Rejected</ion-label>
+			</ion-segment-button>
+		</ion-segment>
+
+	</div>
+	<div *ngIf="pageType!='worker';else myWorkers">
+		<div *ngIf="showDetails;else noData">
+			<div *ngFor="let timesheet of timesheetList">
+				<div [ngSwitch]="selectedTab" style="margin-top: 10px;">
+					<div *ngSwitchCase="'all'">
+						<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+					</div>
+
+					<div *ngSwitchCase="'created'">
+						<div *ngIf="(timesheet.Status | uppercase) =='CREATED'">
+							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+						</div>
+					</div>
+					<div *ngSwitchCase="'approved'">
+						<div *ngIf="timesheet.Status=='Approved'">
+							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+						</div>
+					</div>
+					<div *ngSwitchCase="'rejected'">
+						<div *ngIf="timesheet.Status=='Rejected'">
+							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addTimesheet()">
+			<ion-fab-button size="small">
+				<ion-icon name="add"></ion-icon>
+			</ion-fab-button>
+		</ion-fab>
+		<ng-template #noData>
+			<p>No Data Found</p>
+		</ng-template>
+	</div>
+
+
+	<ng-template #myWorkers>
+		<div *ngFor="let timesheet of myworkerTimesheetList">
+			<timesheet-home-element [timesheetApp]="timesheet" [pageType]="'worker'"></timesheet-home-element>
+		</div>
+	</ng-template>
+</ion-content>

@@ -1,0 +1,83 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title *ngIf="pageType=='worker'">Leave Line</ion-title>
+        <ion-title *ngIf="pageType!='worker' && !resupmtion">Leave Edit</ion-title>
+        <ion-title *ngIf="pageType!='worker' && resupmtion">Leave Resumption</ion-title>
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="pageType!='worker' &&  !leaveApp.ResumptionInitiated;else resume">
+            <button class="submitBtn" (click)="saveLeave()" [disabled]="!editable">
+                <ion-icon name="save"></ion-icon>
+            </button>
+        </ion-buttons>
+
+        <ng-template #resume>
+            <ion-buttons slot="end">
+                <button class="submitBtn" (click)="saveLeave()">
+                    <ion-icon name="save"></ion-icon>
+                </button>
+            </ion-buttons>
+        </ng-template>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list *ngFor="let leaveLine of leaveApp.LeaveApplicationLine">
+        <ion-list-header>
+            <ion-label> {{leaveLine.AbsenceCodeDescription}} </ion-label>
+        </ion-list-header>
+
+        <ion-item class="itbr" (click)="openCalendar(leaveLine)">
+            <ion-label position="floating">Start Date</ion-label>
+            <ion-input [value]="leaveLine.StartDate | date:'fullDate'" [readonly]="true" [disabled]="!editable">
+            </ion-input>
+        </ion-item>
+
+
+        <ion-item class="itbr" (click)="openCalendarForActual(leaveLine)">
+            <ion-label position="floating">Actual Start Date</ion-label>
+            <ion-input [value]="leaveLine.ActualStartDate | date:'fullDate'" [readonly]="true" [disabled]="!leaveApp.ResumptionInitiated">
+            </ion-input>
+        </ion-item>
+
+
+        <ion-item class="itbr" (click)="openCalendar(leaveLine)">
+            <ion-label position="floating">End Date</ion-label>
+            <ion-input [value]="leaveLine.EndDate | date:'fullDate'" [readonly]="true" [disabled]="!editable">
+            </ion-input>
+        </ion-item>
+
+
+        <ion-item class="itbr" (click)="openCalendarForActual(leaveLine)">
+            <ion-label position="floating">Actual End Date</ion-label>
+            <ion-input [value]="leaveLine.ActualEndDate | date:'fullDate'" [readonly]="true" [disabled]="!leaveApp.ResumptionInitiated">
+            </ion-input>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Days</ion-label>
+            <ion-input [(ngModel)]="leaveLine.LeaveApplied" readonly="true"></ion-input>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Balance Days</ion-label>
+            <ion-input [(ngModel)]="leaveLine.Balance" readonly="true"></ion-input>
+
+        </ion-item>
+
+        <ion-item class="itbr" *ngIf="leaveLine.ValidFrom == leaveLine.ValidTo && leaveLine.ValidFrom !== undefined">
+            <ion-label position="floating">Hours</ion-label>
+            <ion-input type="number" [min]="0" [max]="24" [(ngModel)]="leaveLine.hours" [disabled]="!editable"
+                class="hours"></ion-input>
+        </ion-item>
+
+        <ion-item class="itbr">
+            <ion-label position="floating">Remarks</ion-label>
+            <ion-textarea [(ngModel)]="leaveLine.Remarks" [disabled]="!editable">
+            </ion-textarea>
+        </ion-item>
+    </ion-list>
+</ion-content>

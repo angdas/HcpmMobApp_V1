@@ -1,0 +1,43 @@
+.submitBtn {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: white;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    ion-icon {
+        font-size: 19px;
+    }
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    height: 40px !important;
+    display: flex;
+    top: 15% !important;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* pointer-events: none; */
+}
+
+::ng-deep datepicker-value-example .mat-form-field-label {
+    color: red;
+}
+
+::ng-deep .mat-datepicker-toggle {
+    color: red;
+}
+::ng-deep .mat-form-field-underline {
+    background: red;
+}
+
+::ng-deep  button.days-btn[disabled] p {
+    color: rgba(255, 255, 255, 0.32) !important;
+}
+::ng-deep button.days-btn p{
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+ion-item {
+    --highlight-color-focused: none;
+  }  

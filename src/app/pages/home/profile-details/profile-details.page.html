@@ -1,0 +1,178 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-title>{{pageType}}</ion-title>
+
+    <ion-buttons slot="start" (click)="closeModal()" style="padding: 16px;font-size: 24px;">
+      <ion-icon name="arrow-back"></ion-icon>
+    </ion-buttons>
+
+
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="pageType == 'Job Details'">
+
+    <ion-item>
+      <ion-label>Employee Id</ion-label>
+      <ion-label>{{emp.WorkerId}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Job Title</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.JobTitle}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Department</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.Department}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Reporting Mgr</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.ReportingManager}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Joining Date</ion-label>
+      <ion-label>{{emp.JoiningDate | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+  </div>
+
+
+  <!-- Personal Details -->
+
+  <div *ngIf="pageType =='Personal Details'">
+    <ion-item>
+      <ion-label>Date of Birth</ion-label>
+      <ion-label class="ion-text-wrap" *ngIf="checkDate(emp.DateOfBirth)">{{emp.DateOfBirth | date:'mediumDate'}}
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Gender</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.Gender}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Marital Status</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.MaritalStatus}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Nationality</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.Nationality}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Address</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.Address}}</ion-label>
+    </ion-item>
+  </div>
+
+  <!-- Document Details -->
+  <div *ngIf="pageType =='Document Details'">
+
+    <div *ngFor="let identification of emp.WorkerIdentification">
+      <ion-item-divider>
+        <ion-label>
+          {{identification.IdentificationType}}
+        </ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-label> No.</ion-label>
+        <ion-label class="ion-text-wrap">{{identification.IdentificationNumber}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label> Valid From </ion-label>
+        <ion-label class="ion-text-wrap">{{identification.ValidFrom | date:'mediumDate'}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label> Valid To </ion-label>
+        <ion-label class="ion-text-wrap">{{identification.ValidTo | date:'mediumDate'}}</ion-label>
+      </ion-item>
+    </div>
+
+    <!-- <ion-item-divider color="light">
+      <ion-label>
+        Passport Details
+      </ion-label>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-label>Passport No</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.PassportNumber}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Issue Date</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.PassportIssueDate | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Expiry Date</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.PassportExpiryDate | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+    <ion-item-divider color="light">
+      <ion-label>
+        Civil Id Details
+      </ion-label>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-label>Civil Id</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.CivilIdNumber}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Civil Id Issue</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.CivilIdIssueDate | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Civil Id Expiry</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.CivilIdExpiryDate | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+    <ion-item-divider color="light">
+      <ion-label>
+        Visa Details
+      </ion-label>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-label>Visa No</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.VisaNo}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Visa Issue</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.VisaIssue | date:'mediumDate'}}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Visa Expiry</ion-label>
+      <ion-label class="ion-text-wrap">{{emp.VisaExpiry | date:'mediumDate'}}</ion-label>
+    </ion-item> -->
+
+
+
+  </div>
+
+  <!-- Leave Balance Details -->
+
+  <div *ngIf="pageType =='Leave Balance'">
+    <ion-item *ngFor="let leave of leaveBalance">
+      <ion-label class="ion-text-wrap">{{leave.AbsenceCodeDescription}}</ion-label>
+      <ion-label class="ion-text-right">{{leave.AbsenceDays | number : '1.2-2'}}</ion-label>
+    </ion-item>
+  </div>
+
+</ion-content>

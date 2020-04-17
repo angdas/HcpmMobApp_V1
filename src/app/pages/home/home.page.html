@@ -1,0 +1,49 @@
+<ion-content class="ion-padding-end">
+
+  <ion-row>
+    <ion-icon name="arrow-back-outline" color="white" (click)="goBack()"></ion-icon>
+  </ion-row>
+
+  <ion-row class="ion-padding-start">
+    <ion-thumbnail>
+      <img [src]="getImageStr()" style="border: 3px solid #3952a6">
+    </ion-thumbnail>
+  </ion-row>
+
+
+  <ion-item lines="none">
+    <ion-label color="light">
+      <h1>{{emp.Name}} </h1>
+    </ion-label>
+  </ion-item>
+  <ion-item class="br">
+    <ion-label color="light">
+      <div>{{emp.Email}}</div>
+      <div>{{emp.Phone}} </div>
+
+    </ion-label>
+  </ion-item>
+
+  <!-- <ion-item-divider class="pd">
+    <ion-label>
+      <h2>Settings</h2>
+    </ion-label>
+  </ion-item-divider> -->
+
+  <ion-item detail="true" (click)="presentModal('Personal Details')">
+    <ion-label>Personal Details</ion-label>
+  </ion-item>
+
+  <ion-item detail="true" (click)="presentModal('Job Details')">
+    <ion-label>Job Details</ion-label>
+  </ion-item>
+
+  <ion-item detail="true" (click)="presentModal('Document Details')">
+    <ion-label>Document Details</ion-label>
+  </ion-item>
+
+  <ion-item detail="true" (click)="presentModal('Leave Balance')">
+    <ion-label>Leave Balance</ion-label>
+  </ion-item>
+
+</ion-content>

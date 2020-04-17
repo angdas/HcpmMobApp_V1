@@ -1,0 +1,73 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Leave</ion-title>
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="pageType!='worker'">
+            <button class="addButton" (click)="addLeave()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles"
+            refreshingText="Refreshing...">
+        </ion-refresher-content>
+    </ion-refresher>
+
+    <ion-searchbar mode="ios" [(ngModel)]="searchedItem"></ion-searchbar>
+
+    <div *ngIf="pageType != 'worker'">
+        <ion-segment [(ngModel)]="selectedTab">
+            <ion-segment-button value="all">
+                <ion-label>All</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="created">
+                <ion-label>Created</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="approved">
+                <ion-label>Approved</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="rejected">
+                <ion-label>Rejected</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </div>
+
+    <div *ngIf="pageType != 'worker';else myWorkers">
+        <div *ngFor="let leave of leaveAppList | filter:searchedItem">
+            <div [ngSwitch]="selectedTab" style="margin-top: 10px;">
+                <div *ngSwitchCase="'all'">
+                    <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
+                </div>
+
+                <div *ngSwitchCase="'created'">
+                    <div *ngIf="(leave.Status | uppercase) =='CREATED'">
+                        <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'approved'">
+                    <div *ngIf="(leave.Status | uppercase) =='APPROVED'">
+                        <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'rejected'">
+                    <div *ngIf="(leave.Status | uppercase) =='REJECTED'">
+                        <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #myWorkers>
+        <div *ngFor="let leave of workerLeaveList">
+            <leave-home-element [leaveApp]="leave" [pageType]="'worker'"></leave-home-element>
+        </div>
+    </ng-template>
+</ion-content>

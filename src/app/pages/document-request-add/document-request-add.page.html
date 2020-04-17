@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Create HR Request</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <button class="submitBtn" (click)="saveDocReq()">
+        <ion-icon name="save"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+
+  <ion-item class="itbr">
+    <ion-label position="floating">Request Type</ion-label>
+    <ion-select okText="Okay" cancelText="Dismiss" interface="action-sheet" [selectedText]="newDocLine.DocumentRequestTypeCode"
+      [(ngModel)]="newDocLine.DocumentRequestTypeCode">
+      <ion-select-option *ngFor="let reqType of docRequestTypeList" [value]="reqType.HRRequestTypeCode">
+        {{reqType.HRRequestTypeCode}} - {{reqType.Description}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item class="itbr">
+    <ion-label position="floating">Address Type</ion-label>
+    <ion-select okText="Okay" cancelText="Dismiss" interface="action-sheet" [selectedText]="newDocLine.DocumentRequestAddressCode"
+      [(ngModel)]="newDocLine.DocumentRequestAddressCode">
+      <ion-select-option *ngFor="let reqAddress of docReqAddressTypeList" [value]="reqAddress.HRRequestAddressCode">
+        {{reqAddress.HRRequestAddressCode}} - {{reqAddress.DocumentAddressTo}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+
+  <ion-item class="itbr">
+    <ion-label position="floating">Remarks</ion-label>
+    <ion-textarea rows="3" cols="20" [(ngModel)]="newDocLine.Remarks"></ion-textarea>
+  </ion-item>
+
+</ion-content>

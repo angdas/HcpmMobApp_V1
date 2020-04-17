@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Timesheet Line</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-text-center">
+    Total Hrs : {{timesheetApp.TotalHours}}
+  </div>
+  <table class="margin-top margin-bottom">
+    <tr>
+      <th *ngFor="let day of timesheetPeriodList"> {{day.PeriodDate | date:'EEE dd/LL'}} </th>
+    </tr>
+    <!-- <tr>
+      <ng-container *ngFor="let period of timesheetPeriodList;let k = index">
+        <td>
+          <ng-container *ngFor="let days of timesheetApp.TimesheetLine;let i = index">
+            <ion-badge [ngStyle]="{'background':colorList[i].bgColor }" *ngIf="days[getLineHrs(k)] > 0">
+              {{days[getLineHrs(k)]}}
+            </ion-badge>
+          </ng-container>
+        </td>
+      </ng-container>
+    </tr> -->
+
+    <tr>
+      <td *ngFor="let period of timesheetPeriodList;let k = index">
+        <ion-badge class="totalHrs" *ngIf="period.totalHrs > 0">
+          {{period.totalHrs}}
+        </ion-badge>
+      </td>
+    </tr>
+  </table>
+
+  <div style="margin: 0 10px;">
+    <ion-list *ngFor="let tsLine of timesheetApp.TimesheetLine,let i=index">
+      <div *ngIf="!tsLine.IsDeleted">
+        <div class="projDetail"
+          [ngStyle]="{'border-left-style': 'solid','border-left-width' : '8px','border-left-color':colorList[i].bgColor }">
+          <p><b>Project : {{tsLine.ProjDescription}}</b></p>
+
+          <ion-icon class="nextIcon" (click)="editProjectDetails(tsLine)" name="chevron-forward-outline"></ion-icon>
+
+          <p style="margin-top:8px;">Total Hours : {{getHrs(tsLine)}}</p>
+          <p style="margin-top:8px;" (click)="tsLine.toggle = !tsLine.toggle;">
+            Activity : {{tsLine.ProjActivityDescription}}
+          </p>
+
+          <ion-grid *ngIf="tsLine.toggle" (click)="tsLine.toggle = !tsLine.toggle;">
+
+            <ion-row style="font-weight: 600;">
+              <ion-col size="2">Day</ion-col>
+              <ion-col size="1"></ion-col>
+              <ion-col size="3">Hours</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Sun </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours1}}</ion-col>
+            </ion-row>
+
+
+            <ion-row>
+              <ion-col size="2"> Mon </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours2}}</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Tue </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours3}}</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Wed </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours4}}</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Thu </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours5}}</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Fri </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours6}}</ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="2"> Sat </ion-col>
+              <ion-col size="1"> - </ion-col>
+              <ion-col size="3"> {{tsLine.Hours7}}</ion-col>
+            </ion-row>
+
+
+
+          </ion-grid>
+          <ion-icon name="caret-up-outline" class="expand" (click)="tsLine.toggle = !tsLine.toggle;"
+            [ngStyle]="{'transform': tsLine.toggle ? 'rotateZ(135deg)': 'rotateZ(320deg)'}"></ion-icon>
+        </div>
+      </div>
+    </ion-list>
+  </div>
+
+
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addTimesheetLine()">
+    <ion-fab-button size="small" [disabled]="!isEditable">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,51 @@
+<!-- <div class="container">
+    <ion-item lines="none">
+        <ion-button slot="start" fill="outline" (click)="saveData()">Save</ion-button>
+        <ion-button slot="end" fill="outline" (click)="closePopup()">Close</ion-button>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="floating">Hours</ion-label>
+        <ion-input type="tel" [min]="0" [max]="24" [(ngModel)]="hours"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="floating">Internal Comment</ion-label>
+        <ion-textarea [(ngModel)]="internalComment"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="floating">External Comment</ion-label>
+        <ion-textarea [(ngModel)]="externalComment"></ion-textarea>
+    </ion-item>
+</div> -->
+<ion-grid class="ion-padding">
+
+    <ion-row class="ion-justify-content-end">
+        <ion-button size="small" (click)="closePopup()">
+            <ion-icon name="close-circle"></ion-icon>
+        </ion-button>
+    </ion-row>
+
+    <ion-item>
+        <ion-label position="floating">Hours</ion-label>
+        <ion-input type="tel" [min]="0" [max]="24" [(ngModel)]="hours" (keyup.enter)="saveData()"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="floating">Internal Comment</ion-label>
+        <ion-textarea [(ngModel)]="internalComment"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="floating">External Comment</ion-label>
+        <ion-textarea [(ngModel)]="externalComment"></ion-textarea>
+    </ion-item>
+
+    <ion-row>
+        <ion-item lines="none">
+            <ion-button size="small" (click)="saveData()">Save</ion-button>
+        </ion-item>
+    </ion-row>
+
+</ion-grid>

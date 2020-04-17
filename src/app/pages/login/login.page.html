@@ -1,0 +1,55 @@
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-padding-top">
+      <img src="../../../assets/Img/besix.png" class="ion-align-items-center logo">
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center">
+      <ion-text class="ion-padding-top font">
+        Welcome to HCPM
+      </ion-text>
+    </ion-row>
+    <p class="ion-text-center">Please login to continue</p>
+    <!-- <ion-row class="ion-padding-top">
+      <ion-col>
+        <ion-button expand="block"><img class="im" src="../../../assets/Img/fb.png"></ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button expand="block"><img class="im" src="../../../assets/Img/google.png"></ion-button>
+      </ion-col>
+    </ion-row> -->
+  </ion-grid>
+
+  <div style="margin-top: 40px;">
+    <ion-item>
+      <ion-label position="floating" color="l">Username</ion-label>
+      <ion-input mode="ios" color="l" [(ngModel)]="loginModel.Id"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" color="l">Password</ion-label>
+      <ion-input type="password" mode="ios" color="l" [(ngModel)]="loginModel.Password" #passwordField></ion-input>
+
+      <!-- <ion-button fill="clear" slots="end" item-right (click)="showPasswordBtn()">
+      <ion-icon name="eye" *ngIf="!showPassword" class="showPass"></ion-icon>
+      <ion-icon name="eye-off" *ngIf="showPassword" class="offPass"></ion-icon>
+    </ion-button> -->
+
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Remember me</ion-label>
+      <ion-toggle [(ngModel)]="savePass" color="success"></ion-toggle>
+    </ion-item>
+
+
+    <ion-button expand="block" class="ion-marging-top" (click)="login()" [disabled]="loginSpinner">
+      <span *ngIf="!loginSpinner">Login</span>
+      <ion-spinner name="dots" *ngIf="loginSpinner"></ion-spinner>
+    </ion-button>
+  </div>
+  <p class="textColor settings" (click)="gotoSettings()">
+    <ion-icon name="cog-outline"></ion-icon>
+    Settings
+  </p>
+</ion-content>

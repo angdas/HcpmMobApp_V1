@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Payslip</ion-title>
+    <ion-buttons slot="start" >
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item class="itbr">
+    <ion-label color="light">Select Month</ion-label>
+    <ion-datetime display-format="MMMM YYYY" palceholder="select Month" [(ngModel)]="selectedMonth"
+      (ionChange)="monthValueChanged()">
+    </ion-datetime>
+  </ion-item>
+
+  <div *ngIf="payslip.length ; else noPayroll">
+
+    <ion-item (click)="downloadPayslip()" lines="none">
+      <ion-label><u>Download as PDF</u></ion-label>
+    </ion-item>
+
+  </div>
+  <ng-template #noPayroll>
+    <div class="noData">
+      No payroll for this period
+    </div>
+  </ng-template>
+</ion-content>

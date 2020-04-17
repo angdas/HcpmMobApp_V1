@@ -24,3 +24,74 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+
+.textColor{
+    color: #f4f5f8;
+}
+
+ion-card,ion-card-header,ion-card-subtitle,ion-card-title,ion-card-content {
+    --background : linear-gradient(to bottom ,#3952a6 , #162552);
+    --color: #fff;
+    --border-radius: 10px;
+  }
+  .alert-title.sc-ion-alert-md{
+    color: white;
+  }
+  ion-menu{
+    --width:80px;
+  }
+
+  ion-header {
+    --background: #0a0a0a;
+  }
+  ion-icon{
+    font-size: 30px;
+  }
+
+  ion-checkbox{
+    --size:18px;
+    --checkmark-color: #000;
+    --background-checked: #0ebf35;
+    --border-color:#d5cfcf;
+  }
+  ion-content{
+    --padding-top:30px;
+    --padding-bottom: 30px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+  ion-button{
+    --background : linear-gradient(to bottom ,#506bc5,#0e193a)
+  }
+  ion-item{
+    --border-color:#777777;
+    --background-focused:green;
+  }
+  .itbr {
+    //--border-color: #334497;
+    // --border-color: #aba8a8;
+    // --border-width: 2px;
+    // --border-radius: 12px;
+    // padding: 5px;
+
+    --background: white;
+    --border-radius: 12px;
+    padding: 5px;
+    color: black;
+  }
+
+
+  
+ion-content {
+  --ion-background-color: linear-gradient(to bottom, #3d51b4, #020717);
+}
+ion-toolbar {
+  --background: -webkit-gradient(linear, left top, left bottom, from(#3d51b4), to(#020717));
+}
+ion-item{
+  --background: none;
+}
+.list-md {
+  background: none !important;
+}
