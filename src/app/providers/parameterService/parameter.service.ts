@@ -24,9 +24,12 @@ export class ParameterService {
   public isManager:boolean;
   public loginCredentials:LoginModel;
   public dataAreaObj:WorkerEmployementModel;
+  public companyLogo:string;
 
   public colorList:any=[];
-  public totalStorageVariables: number = 10;
+
+
+  public totalStorageVariables: number = 11;
 
   public clientConfig:ClientConfigModel = {} as ClientConfigModel;
  

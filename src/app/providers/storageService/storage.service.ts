@@ -113,10 +113,21 @@ export class StorageService {
       }
     })
 
-
+    this.storage.get('hcpmCompanyLogo').then((data) => {
+      this.parameterservice.companyLogo = data;
+      observer.next(data);
+      variables++;
+      if (variables == this.parameterservice.totalStorageVariables) {
+        observer.complete();
+      }
+    })
 
   })
 
+  setCompanyLogo(companylogo){
+    this.storage.set('hcpmCompanyLogo', companylogo);
+    this.parameterservice.companyLogo = companylogo;
+  }
   setDataArea(dataArea) {
     this.storage.set('hcpmDataArea', dataArea);
     this.parameterservice.dataAreaObj = dataArea;
@@ -168,12 +179,15 @@ export class StorageService {
   }
 
   clearStorage() {
+    let companyLogo = this.parameterservice.companyLogo
     this.storage.clear();
     if (this.parameterservice.loginCredentials) {
       this.setLoginCrendentials(this.parameterservice.loginCredentials);
       this.setURL(this.parameterservice.baseUrl);
     }
-    if (this.parameterservice.clientConfig)
+    if (this.parameterservice.clientConfig){
       this.setClientConfig(this.parameterservice.clientConfig);
+    }
+    this.setCompanyLogo(companyLogo);
   }
 }

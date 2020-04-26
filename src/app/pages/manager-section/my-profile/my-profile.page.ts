@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MenuController, AlertController} from '@ionic/angular';
+import { MenuController, AlertController } from '@ionic/angular';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 
 import { Platform } from '@ionic/angular';
@@ -20,12 +20,12 @@ export class MyProfilePage implements OnInit {
 
   imgSrc: any = null;
   emp: EmployeeModel = {} as EmployeeModel;
-  isManager:boolean;
+  isManager: boolean;
   constructor(private sanitizer: DomSanitizer, private menuCtrl: MenuController, public dataService: DataService, public platform: Platform,
     public router: Router, private storageService: StorageService, private parameterservice: ParameterService, public axService: AxService,
-    public events: Events,public alertCtrl:AlertController) { 
-      
-    }
+    public events: Events, public alertCtrl: AlertController) {
+
+  }
 
   ngOnInit() {
     this.getWorkerDetails();
@@ -60,8 +60,8 @@ export class MyProfilePage implements OnInit {
           handler: () => {
             this.events.publish('authenticated', false);
             this.parameterservice.authenticated = false;
-           
-        
+
+
             this.storageService.clearStorage();
             this.router.navigateByUrl("/login");
           }
@@ -71,16 +71,49 @@ export class MyProfilePage implements OnInit {
     confirm.present();
   }
   getWorkerDetails() {
-    this.axService.getWorkerDetails(this.parameterservice.email).subscribe(res => {
+    this.axService.getWorkerDetails(this.parameterservice.email).subscribe(async (res) => {
       console.log(res);
       this.emp = res;
       this.dataService.setMyDetails(res);
       this.storageService.setUserDetails(res);
       this.storageService.setDataArea(this.emp.WorkerEmployement[0]);
-      this.events.publish("isManager",this.emp.IsManager);
+      this.events.publish("isManager", this.emp.IsManager);
       this.parameterservice.isManager = this.emp.IsManager;
-      this.isManager =  this.parameterservice.isManager;
+      this.isManager = this.parameterservice.isManager;
       this.imgSrc = this.emp.Images;
+
+
+      if (res.WorkerEmployement.length == 1) {
+        this.storageService.setDataArea(res.WorkerEmployement[0]);
+      } else {
+        let inputArr = [];
+        res.WorkerEmployement.forEach(el => {
+          inputArr.push(
+            {
+              name: 'radio',
+              type: 'radio',
+              label: el.DataArea,
+              value: el,
+            }
+          )
+        })
+        const alert = await this.alertCtrl.create({
+          header: 'Radio',
+          backdropDismiss: false,
+          inputs: inputArr,
+          buttons: [
+            {
+              text: 'Ok',
+              handler: (data) => {
+                this.storageService.setDataArea(data);
+                console.log(data);
+              }
+            }
+          ]
+        });
+
+        alert.present();
+      }
 
     }, (error) => {
 
@@ -103,10 +136,10 @@ export class MyProfilePage implements OnInit {
     }, 2000);
   }
 
-  navigateToPage(whenManager,whenEmp){
-    if(this.isManager){
+  navigateToPage(whenManager, whenEmp) {
+    if (this.isManager) {
       this.router.navigateByUrl(whenManager);
-    }else{
+    } else {
       this.router.navigateByUrl(whenEmp);
     }
 

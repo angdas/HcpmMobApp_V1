@@ -4,18 +4,12 @@
         <ion-buttons slot="start">
             <ion-back-button></ion-back-button>
         </ion-buttons>
-
-        <ion-buttons slot="end" *ngIf="pageType!='worker'">
-            <button class="addButton" (click)="addLeave()">
-                <ion-icon name="add"></ion-icon>
-            </button>
-        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles"
+        <ion-refresher-content pullingIcon="arrow-down-outline" pullingText="Pull to refresh" refreshingSpinner="circles"
             refreshingText="Refreshing...">
         </ion-refresher-content>
     </ion-refresher>
@@ -39,7 +33,7 @@
         </ion-segment>
     </div>
 
-    <div *ngIf="pageType != 'worker';else myWorkers">
+    <ng-container *ngIf="pageType != 'worker';else myWorkers">
         <div *ngFor="let leave of leaveAppList | filter:searchedItem">
             <div [ngSwitch]="selectedTab" style="margin-top: 10px;">
                 <div *ngSwitchCase="'all'">
@@ -63,7 +57,14 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addLeave()">
+            <ion-fab-button size="small">
+                <ion-icon name="add"></ion-icon>
+            </ion-fab-button>
+        </ion-fab>
+
+    </ng-container>
 
     <ng-template #myWorkers>
         <div *ngFor="let leave of workerLeaveList">

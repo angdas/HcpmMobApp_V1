@@ -1,18 +1,9 @@
 <ion-header>
   <ion-toolbar>
-
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    
     <ion-title>HR Request</ion-title>
-
-
-    <ion-buttons slot="end" *ngIf="pageType!='worker'">
-      <button class="addButton" (click)="addRequestLine()" [disabled]="!editable">
-        <ion-icon name="add"></ion-icon>
-      </button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -22,11 +13,19 @@
     <div *ngIf="!reqLine.IsDeleted">
       <div (click)="editRequestLine()">
         <div class="projDetail"
-          [ngStyle]="{'border-left-style': 'solid','border-left-width' : '15px','border-left-color':colorList[i].bgColor }">
+          [ngStyle]="{'border-left-style': 'solid','border-left-width' : '8px','border-left-color':colorList[i].bgColor }">
           <p style="margin-top:8px;"> Request Type : {{reqLine.DocumentRequestTypeCode}}</p>
           <p>Address Type : {{reqLine.DocumentRequestAddressCode}}</p>
         </div>
       </div>
     </div>
   </ion-list>
+
+
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addRequestLine()">
+    <ion-fab-button size="small" [disabled]="!editable">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>

@@ -60,7 +60,7 @@ export class DocumentRequestLinePage implements OnInit {
   }
 
 
-  async saveLeave() {
+  async saveDoc() {
     const loading = await this.loadingController.create({
       spinner: "lines",
       duration: 3000,

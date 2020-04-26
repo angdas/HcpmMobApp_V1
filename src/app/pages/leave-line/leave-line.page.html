@@ -4,15 +4,9 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    
+
     <ion-title>Leave Line</ion-title>
 
-
-    <ion-buttons slot="end" *ngIf="pageType!='worker'">
-      <button class="addButton" (click)="addLeaveLine()" [disabled]="!editable">
-        <ion-icon name="add"></ion-icon>
-      </button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -30,4 +24,12 @@
       </div>
     </div>
   </ion-list>
+
+
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addLeaveLine()">
+    <ion-fab-button size="small" [disabled]="!editable">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>

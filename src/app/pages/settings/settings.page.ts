@@ -44,7 +44,7 @@ export class SettingsPage implements OnInit {
     if (this.paramServ.clientConfig)
       this.clientConfig = this.paramServ.clientConfig;
 
-      console.log(this.clientConfig)
+    console.log(this.clientConfig)
   }
   ionViewWillEnter() {
     this.clientIdInput.setFocus();
@@ -53,13 +53,11 @@ export class SettingsPage implements OnInit {
   async getClientUrl() {
     const loading = await this.loadingController.create({
       spinner: "lines",
-      duration: 3000,
       message: 'Please wait...',
     });
     await loading.present();
 
     this.axService.GetClientConfig(this.clientConfig).subscribe((res: ClientConfigModel) => {
-      console.log(res);
       loading.dismiss();
       if (!res.api) {
         this.presentAlert(res)
@@ -67,7 +65,13 @@ export class SettingsPage implements OnInit {
         this.storageService.setClientConfig(this.clientConfig);
         this.axService.baseAddress = res.api;
         this.storageService.setURL(res.api);
-        this.router.navigateByUrl("/login");
+
+        this.axService.getERPconfig().subscribe(res => {
+          console.log(res);
+          this.storageService.setCompanyLogo(res.CompanyLogo);
+          this.paramServ.companyLogo = res.CompanyLogo;
+          this.router.navigateByUrl("/login");
+        })
       }
     }, error => {
       loading.dismiss();

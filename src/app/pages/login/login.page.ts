@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonInput, ToastController, MenuController } from '@ionic/angular';
+import { IonInput, ToastController, MenuController, AlertController } from '@ionic/angular';
 import { LoginModel } from 'src/app/models/login.model';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { ParameterService } from 'src/app/providers/parameterService/parameter.s
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { Events } from 'src/app/providers/events/event.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -15,50 +16,56 @@ import { Events } from 'src/app/providers/events/event.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  
+
   @ViewChild('passwordField', { static: false }) passwordField: IonInput;
 
   loginModel: LoginModel = {} as LoginModel;
 
   showPassword: boolean;
   loginSpinner: boolean;
-  savePass:boolean;
+  savePass: boolean;
+
+  imgSrc: any;
   constructor(public axservice: AxService, public router: Router, public toastController: ToastController,
     public storageServ: StorageService, public paramService: ParameterService, public dataService: DataService,
-    private menuCtrl: MenuController,public event:Events) { 
-      this.menuCtrl.enable(false);
+    private menuCtrl: MenuController, public event: Events, private sanitizer: DomSanitizer, public alertController: AlertController) {
+    this.menuCtrl.enable(false);
 
-      this.menuCtrl.enable(false);      
-    }
+    this.menuCtrl.enable(false);
+  }
 
   ngOnInit() {
-    this.storageServ.getAllValuesFromStorage.subscribe(res=>{
+    this.storageServ.getAllValuesFromStorage.subscribe(res => {
 
-    },error=>{
+    }, error => {
 
-    },()=>{
-      if(this.paramService.loginCredentials){
+    }, () => {
+
+      if (this.paramService.loginCredentials) {
         this.loginModel = this.paramService.loginCredentials;
         this.savePass = true;
       }
     })
   }
+  ionViewWillEnter() {
+    this.imgSrc = this.sanitizer.bypassSecurityTrustUrl("data:image/png;base64," + this.paramService.companyLogo);
+  }
 
   login() {
     this.loginSpinner = true;
 
-    if(this.savePass){
+    if (this.savePass) {
       this.storageServ.setLoginCrendentials(this.loginModel);
     }
     this.axservice.userLogin(this.loginModel).subscribe(res => {
       this.loginSpinner = false;
       if (res) {
-        this.event.publish('authenticated',true);
+        this.event.publish('authenticated', true);
         this.storageServ.setAuthenticated(true);
         this.storageServ.setEmail(this.loginModel.Id);
         this.getWorkerDetails();
       } else {
-        this.event.publish('authenticated',false);
+        this.event.publish('authenticated', false);
         this.storageServ.setAuthenticated(false);
         this.errorToast("Invalid Credentials")
       }
@@ -68,26 +75,25 @@ export class LoginPage implements OnInit {
     })
   }
   getWorkerDetails() {
-    this.axservice.getWorkerDetails(this.paramService.email).subscribe((res:EmployeeModel) => {
+    this.axservice.getWorkerDetails(this.paramService.email).subscribe(async (res: EmployeeModel) => {
       console.log(res);
-      if(!res.Name){
+      if (!res.Name) {
         this.storageServ.setAuthenticated(false);
         this.errorToast("Worker not found");
-        this.event.publish('authenticated',false);
-      }else{
+        this.event.publish('authenticated', false);
+      } else {
         this.dataService.setMyDetails(res);
         this.storageServ.setUserDetails(res);
-        this.storageServ.setDataArea(res.WorkerEmployement[0]);
-        this.event.publish("isManager",res.IsManager);
+        this.event.publish("isManager", res.IsManager);
         if (res.IsManager) {
           this.router.navigateByUrl("/tab/tabs/manager-profile");
         } else {
           this.router.navigateByUrl("/myprofile")
         }
       }
-    
+
     }, (error) => {
-    
+
     })
   }
 
@@ -110,7 +116,7 @@ export class LoginPage implements OnInit {
     }
   }
 
-  gotoSettings(){
+  gotoSettings() {
     this.router.navigateByUrl("settings")
   }
 }

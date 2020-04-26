@@ -17,27 +17,17 @@
       <ion-input type="text" [(ngModel)]="clientConfig.clientId" placeholder="Enter Client ID" #clientId></ion-input>
     </ion-item>
 
-    <ion-list>
-      <ion-radio-group [(ngModel)]="clientConfig.instance">
-        <ion-item>
-          <ion-label>LIVE</ion-label>
-          <ion-radio slot="start" value="LIVE"></ion-radio>
-        </ion-item>
+    <ion-item>
+      <ion-label>Instance</ion-label>
+      <ion-select  [(ngModel)]="clientConfig.instance" interface="action-sheet">
+        <ion-select-option value="LIVE">LIVE</ion-select-option>
+        <ion-select-option value="UAT">UAT</ion-select-option>
+      </ion-select>
+    </ion-item>
 
-        <ion-item>
-          <ion-label>UAT</ion-label>
-          <ion-radio slot="start" value="UAT" checked></ion-radio>
-        </ion-item>
-
-      </ion-radio-group>
-    </ion-list>
     <ion-button (click)="getClientUrl()" expand="block" style="margin-top: 16px;">
       Submit
     </ion-button>
-  </div>
-
-  <div *ngIf="!authenticated">
-
   </div>
 
   <p class="appVersion">Version : {{versionNumber}}</p>

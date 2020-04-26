@@ -39,7 +39,6 @@ export class TabsPage {
 
 
   isManagerEvent() {
-    console.log("hi")
     this.isManager = this.paramService.isManager;
     this.events.subscribe("isManager", res => {
       this.isManager = res;

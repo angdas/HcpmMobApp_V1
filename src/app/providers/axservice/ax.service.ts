@@ -12,19 +12,7 @@ import { ClientConfigModel } from 'src/app/models/ClientConfig.model';
 })
 export class AxService {
 
-  //public baseAddress: string = "https://ofm-devdevaos.sandbox.ax.dynamics.com";
-
-  //AFZ ENV
-  //public baseAddress = "https://hcpmwebapi.azurewebsites.net/";
-
-
-  //OFM LIVE
   public baseAddress = "";
-
-
-  //OFM ENV
-  //public baseAddress= "https://hcpmapiofmuat.azurewebsites.net/";
-  //public azureId = "https://ofm-devdevaos.sandbox.ax.dynamics.com";
 
 
   constructor(public http: HttpClient,
@@ -40,14 +28,19 @@ export class AxService {
     }
 
   }
-  GetClientConfig(clientCOnfig:ClientConfigModel): Observable<any> {
+
+  getERPconfig(): Observable<any>  {
+    let url = this.baseAddress + "api/HCPM/GetERPConfig";
+    return this.http.get(url);
+  }
+  GetClientConfig(clientCOnfig: ClientConfigModel): Observable<any> {
     var service;
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
         let url = "https://hcpm-d365-azfunct.azurewebsites.net/api/GetHcpmPortalClientConfig";
-        let body ={
-          "ClientId":clientCOnfig.clientId,
-          "Instance":clientCOnfig.instance
+        let body = {
+          "ClientId": clientCOnfig.clientId,
+          "Instance": clientCOnfig.instance
         }
         let httpOptions = {
           headers: new HttpHeaders({
@@ -119,7 +112,10 @@ export class AxService {
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
         let url = this.baseAddress + "/api/HCPM/GetHRRequest";
-        let body = { "WorkerId": emp };
+        let body = {
+          "WorkerId": emp,
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
+        };
         let httpOptions = {
           headers: new HttpHeaders({
             'Content-Type': 'Application/json'
@@ -176,7 +172,7 @@ export class AxService {
         let body = {
           "WorkerId": user,
           "Date": periodDate.toDateString(),
-          "DataArea":this.parameterservice.dataAreaObj.DataArea
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
         };
         let httpOptions = {
           headers: new HttpHeaders({
@@ -214,9 +210,9 @@ export class AxService {
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
         let url = this.baseAddress + "api/HCPM/GetLeaveApplication";
-        let body = { 
-          "WorkerId": workerId ,
-          "DataArea":this.parameterservice.dataAreaObj.DataArea
+        let body = {
+          "WorkerId": workerId,
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
         };
         let httpOptions = {
           headers: new HttpHeaders({
@@ -409,13 +405,16 @@ export class AxService {
     var service;
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
+        let body = {
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
+        }
         let url = this.baseAddress + "api/HCPM/GetHrRequestType";
         let httpOptions = {
           headers: new HttpHeaders({
             'Content-Type': 'Application/json'
           })
         };
-        service = this.http.get(url);
+        service = this.http.post(url, JSON.stringify(body), httpOptions);
 
       }
     );
@@ -426,13 +425,16 @@ export class AxService {
     var service;
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
+        let body = {
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
+        }
         let url = this.baseAddress + "api/HCPM/GetHrRequestAddress";
         let httpOptions = {
           headers: new HttpHeaders({
             'Content-Type': 'Application/json'
           })
         };
-        service = this.http.get(url);
+        service = this.http.post(url, JSON.stringify(body), httpOptions);
 
       }
     );
@@ -450,6 +452,7 @@ export class AxService {
             'Content-Type': 'Application/json'
           })
         };
+        console.log(body);
         service = this.http.post(url, body, httpOptions);
 
       }

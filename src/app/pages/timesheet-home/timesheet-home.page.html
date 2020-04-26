@@ -16,7 +16,7 @@
 
 <ion-content>
 	<ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-		<ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles"
+		<ion-refresher-content pullingIcon="arrow-down-outline" pullingText="Pull to refresh" refreshingSpinner="circles"
 			refreshingText="Refreshing...">
 		</ion-refresher-content>
 	</ion-refresher>
@@ -48,7 +48,7 @@
 		</ion-segment>
 
 	</div>
-	<div *ngIf="pageType!='worker';else myWorkers">
+	<ng-container *ngIf="pageType!='worker';else myWorkers">
 		<div *ngIf="showDetails;else noData">
 			<div *ngFor="let timesheet of timesheetList">
 				<div [ngSwitch]="selectedTab" style="margin-top: 10px;">
@@ -83,7 +83,7 @@
 		<ng-template #noData>
 			<p>No Data Found</p>
 		</ng-template>
-	</div>
+	</ng-container>
 
 
 	<ng-template #myWorkers>
