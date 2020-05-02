@@ -19,11 +19,6 @@ import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { Events } from './providers/events/event.service';
-import { Camera } from '@ionic-native/Camera/ngx';
-import { PendingChangesGuard } from './providers/pending-changes.guard';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,12 +31,10 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     }),
     IonicStorageModule.forRoot(),
     AppRoutingModule,
-    BrowserAnimationsModule,
-  
+    BrowserAnimationsModule
   ],
   providers: [
     File,
-    PendingChangesGuard,
     AppVersion,
     FileOpener,
     StatusBar,
@@ -49,7 +42,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     StorageService,
     ParameterService,
     DataService,
-    Camera,
     AxService,
     Events,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }

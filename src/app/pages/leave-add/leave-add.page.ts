@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,8 +13,6 @@ import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
 
 import { CalendarModal, CalendarModalOptions, CalendarResult } from 'ion2-calendar';
-
-import { startWith, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-leave-add',
@@ -36,7 +34,7 @@ export class LeaveAddPage implements OnInit {
   leaveLineAdd: boolean;
 
 
-  dataChangeNotSaved:boolean = false;
+
 
 
   constructor(public dataService: DataService, public router: Router, public toastController: ToastController,
@@ -46,10 +44,6 @@ export class LeaveAddPage implements OnInit {
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
-
-
-
-  
   async openCalendar() {
     const options: CalendarModalOptions = {
       pickMode: 'range',
@@ -88,50 +82,6 @@ export class LeaveAddPage implements OnInit {
     this.getLeaveType(new Date());
 
   }
-
-  @HostListener('change', ['$event'])
-  @HostListener('input', ['$event'])
-  onInput(event: any) {
-    this.dataChangeNotSaved = true;
-  }
-
-  @HostListener('window:beforeunload')
-  isDataSaved(): boolean {
-    if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
-    }
-  } 
-
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
-  }
-
-  
   submitLeave() {
     if (this.validator()) {
       if (this.leaveLineAdd) {

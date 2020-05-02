@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
@@ -49,7 +49,7 @@ export class TimesheetLinePage implements OnInit {
 
   timesheetUpdated: boolean = false;
   isEditable: boolean;
-  dataChangeNotSaved:boolean = false;
+
 
   
   constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
@@ -67,53 +67,6 @@ export class TimesheetLinePage implements OnInit {
       this.getTSLineData();
     }, 300);
   }
-
-
-  @HostListener('change', ['$event'])
-  @HostListener('input', ['$event'])
-  onInput(event: any) {
-    this.dataChangeNotSaved = true;
-  }
-
-  @HostListener('window:beforeunload')
-  isDataSaved(): boolean {
-    if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
-    }
-  } 
-
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
-  }
-
-
-
-
 
   getTSLineData() {
     this.sub0 = this.dataService.getTimesheetHeader$.subscribe(res => {
@@ -299,12 +252,28 @@ export class TimesheetLinePage implements OnInit {
       console.log(res);
       this.timesheetUpdated = true;
 
-      this.router.navigateByUrl("/timesheet-home");
+      this.presentAlertMessage();
     }, error => {
       loading.dismiss();
       console.log(error);
       this.errorToast("Connection Error");
     })
+  }
+  async presentAlertMessage() {
+    const alert = await this.alertController.create({
+      header: 'Success',
+      message: 'Timesheet Updated Successfully',
+      buttons: [
+        {
+          text: 'Ok',
+          handler: (blah) => {
+            this.router.navigateByUrl("/timesheet-home");
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
   validator() {
     if (!this.tsLine.ProjId) {

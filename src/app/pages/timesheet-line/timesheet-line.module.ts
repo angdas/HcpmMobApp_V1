@@ -9,13 +9,11 @@ import { TimesheetLinePage } from './timesheet-line.page';
 import { CommentPageForLine } from './comment/comment.page';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { SearchPage } from 'src/app/common/search/search.page';
-import { PendingChangesGuard } from 'src/app/providers/pending-changes.guard';
 const routes: Routes = [
   {
     path: '',
-    component: TimesheetLinePage,
-    canDeactivate: [PendingChangesGuard]
-  } 
+    component: TimesheetLinePage
+  }
 ];
 
 @NgModule({

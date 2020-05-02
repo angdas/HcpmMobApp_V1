@@ -6,12 +6,10 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LeaveAddPage } from './leave-add.page';
 import { CalendarModule } from "ion2-calendar";
-import { PendingChangesGuard } from 'src/app/providers/pending-changes.guard';
 const routes: Routes = [
   {
     path: '',
-    component: LeaveAddPage,
-    canDeactivate: [PendingChangesGuard]
+    component: LeaveAddPage
   }
 ];
 

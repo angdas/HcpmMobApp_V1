@@ -17,6 +17,18 @@
     <tr>
       <th *ngFor="let day of timesheetPeriodList"> {{day.PeriodDate | date:'EEE dd/LL'}} </th>
     </tr>
+    <!-- <tr>
+      <ng-container *ngFor="let period of timesheetPeriodList;let k = index">
+        <td>
+          <ng-container *ngFor="let days of timesheetApp.TimesheetLine;let i = index">
+            <ion-badge [ngStyle]="{'background':colorList[i].bgColor }" *ngIf="days[getLineHrs(k)] > 0">
+              {{days[getLineHrs(k)]}}
+            </ion-badge>
+          </ng-container>
+        </td>
+      </ng-container>
+    </tr> -->
+
     <tr>
       <td *ngFor="let period of timesheetPeriodList;let k = index">
         <ion-badge class="totalHrs" *ngIf="period.totalHrs > 0">

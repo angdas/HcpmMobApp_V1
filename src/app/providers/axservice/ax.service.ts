@@ -29,7 +29,7 @@ export class AxService {
 
   }
 
-  getERPconfig(): Observable<any> {
+  getERPconfig(): Observable<any>  {
     let url = this.baseAddress + "api/HCPM/GetERPConfig";
     return this.http.get(url);
   }
@@ -461,15 +461,4 @@ export class AxService {
   }
 
 
-  updateLeaveAttachment(attachment): Observable<any> {
-    let url = this.baseAddress + "api/HCPM/UpdateLeaveApplicationAttachment";
-    let body = JSON.stringify(attachment);
-    let httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'Application/json'
-      })
-    };
-    console.log(body);
-    return this.http.post(url, body, httpOptions);
-  }
 }

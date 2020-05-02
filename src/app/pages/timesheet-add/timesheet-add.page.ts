@@ -1,12 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, HostListener, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
-import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { ToastController, AlertController, LoadingController, ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
-import { FormControl, NgModel } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { TimesheetProject } from 'src/app/models/timesheet/tsProject.interface';
 import { TimesheetActivity } from 'src/app/models/timesheet/tsActivity.interface';
@@ -43,9 +43,10 @@ export class TimesheetAddPage implements OnInit {
   sub: any;
   sub0: any;
   sub1: any;
-  pageType: any;
 
-  dataChangeNotSaved: boolean = false;
+
+
+  pageType: any;
 
   tsLineAdd: boolean;
   constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
@@ -56,47 +57,7 @@ export class TimesheetAddPage implements OnInit {
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
 
   }
-  @HostListener('change', ['$event'])
-  @HostListener('input', ['$event'])
-  onInput(event: any) {
-    this.dataChangeNotSaved = true;
-  }
 
-  @HostListener('window:beforeunload')
-  isDataSaved(): boolean {
-    if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
-    }
-  } 
-
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
-  }
 
   ngOnInit() {
     this.getProjectList();
@@ -181,7 +142,7 @@ export class TimesheetAddPage implements OnInit {
       target: {
         getBoundingClientRect: () => {
           return {
-            top: 10
+            top: 50
           };
         }
       }
@@ -250,7 +211,7 @@ export class TimesheetAddPage implements OnInit {
           this.newLine.Hours5 = Number(this.newLine.Hours5) || 0;
           this.newLine.Hours6 = Number(this.newLine.Hours6) || 0;
           this.newLine.Hours7 = Number(this.newLine.Hours7) || 0;
-
+          
           res.TimesheetLine.push(this.newLine);
           this.tsLineAdd = true;
           this.newTimesheet = res;
@@ -305,7 +266,6 @@ export class TimesheetAddPage implements OnInit {
 
         this.axService.getWorkerTimesheet(this.paramService.emp.WorkerId, this.timesheetPeriodList[0].PeriodDate).subscribe(res => {
           console.log(res);
-          this.dataChangeNotSaved = false;
           this.timesheetList = res;
           this.dataService.setTimesheetList(this.timesheetList);
         }, (error) => {
@@ -315,19 +275,36 @@ export class TimesheetAddPage implements OnInit {
         // this.dataService.setTimesheetList(this.timesheetList);
       }
       loading.dismiss();
-      if (!this.tsLineAdd) {
-        this.dataService.settimesheetPeriodList(this.timesheetPeriodList);
-        this.dataService.setTimesheetHeader(this.newTimesheet);
-
-        this.router.navigateByUrl("timesheet-header");
-      } else {
-        this.location.back();
-      }
+      this.presentAlertMessage();
     }, error => {
       loading.dismiss();
       this.errorToast("Connection Error");
     })
   }
+  async presentAlertMessage() {
+    const alert = await this.alertController.create({
+      header: 'Success',
+      message: 'Timesheet Updated Successfully',
+      buttons: [
+        {
+          text: 'Ok',
+          handler: (blah) => {
+            if (!this.tsLineAdd) {
+              this.dataService.settimesheetPeriodList(this.timesheetPeriodList);
+              this.dataService.setTimesheetHeader(this.newTimesheet);
+
+              this.router.navigateByUrl("timesheet-header");
+            } else {
+              this.location.back();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
 
   validator() {
     if (!this.newLine.ProjId) {

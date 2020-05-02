@@ -1,4 +1,4 @@
-import { Component, OnInit, ɵConsole, HostListener } from '@angular/core';
+import { Component, OnInit, ɵConsole } from '@angular/core';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { DataService } from 'src/app/providers/dataService/data.service';
@@ -32,7 +32,6 @@ export class DocumentRequestAddPage implements OnInit {
 
   pageType: any;
   documentLineAdd: boolean;
-  dataChangeNotSaved: boolean = false;
 
   constructor(public axService: AxService, public dataService: DataService, public paramService: ParameterService, public router: Router,
     public loadingController: LoadingController, public alertController: AlertController, public toastController: ToastController,
@@ -53,50 +52,6 @@ export class DocumentRequestAddPage implements OnInit {
       }
     })
   }
-
-
-  @HostListener('change', ['$event'])
-  @HostListener('input', ['$event'])
-  onInput(event: any) {
-    this.dataChangeNotSaved = true;
-  }
-
-  @HostListener('window:beforeunload')
-  isDataSaved(): boolean {
-    if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    } else {
-      return true;
-    }
-  }
-
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
-  }
-
   ngOnDestroy() {
     this.sub.unsubscribe();
     if (this.documentLineAdd) {
