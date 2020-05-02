@@ -15,6 +15,13 @@
             </ion-buttons>
         </ng-template>
 
+        <ion-buttons slot="end">
+            <ion-button color="danger" fill="outline" [disabled]="!editable" (click)="selectImage()">
+                <ion-icon name="attach-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+
+
     </ion-toolbar>
 </ion-header>
 

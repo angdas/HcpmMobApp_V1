@@ -5,11 +5,13 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 import { DocumentRequestAddPage } from './document-request-add.page';
+import { PendingChangesGuard } from 'src/app/providers/pending-changes.guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: DocumentRequestAddPage
+    component: DocumentRequestAddPage,
+    canDeactivate: [PendingChangesGuard]
   }
 ];
 

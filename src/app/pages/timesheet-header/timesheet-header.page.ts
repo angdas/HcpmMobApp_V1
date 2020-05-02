@@ -75,7 +75,7 @@ export class TimesheetHeaderPage implements OnInit {
     var hrs = timeSheetLine.Hours1 + timeSheetLine.Hours2 + timeSheetLine.Hours3 + timeSheetLine.Hours4 + timeSheetLine.Hours5
       + timeSheetLine.Hours6 + timeSheetLine.Hours7
 
-    return hrs;
+    return Number(hrs.toFixed(1)); ;
   }
 
   gettotalHrsByDays() {

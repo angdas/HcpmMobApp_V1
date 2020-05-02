@@ -1,12 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { DataService } from 'src/app/providers/dataService/data.service';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
-import { ToastController, LoadingController, AlertController, ModalController } from '@ionic/angular';
+import { ToastController, LoadingController, AlertController, ModalController, ActionSheetController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LeaveAppLineContract } from 'src/app/models/leave/leaveAppLineContract.interface';
 import { CalendarModalOptions, CalendarModal } from 'ion2-calendar';
+import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
+import { File } from '@ionic-native/file/ngx'
+import { LeaveAttachmentModel } from 'src/app/models/leave/leaveAttachment.model';
+import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 @Component({
   selector: 'app-leave-edit',
   templateUrl: './leave-edit.page.html',
@@ -19,11 +25,16 @@ export class LeaveEditPage implements OnInit {
   editable: boolean;
   pageType: any;
 
-  resupmtion:boolean;
-  resumptionUpdated:boolean;
+  resupmtion: boolean;
+  resumptionUpdated: boolean;
+  dataChangeNotSaved:boolean = false;
+  
 
   constructor(public dataService: DataService, public axService: AxService, public router: Router, private activateRoute: ActivatedRoute,
-    public alertController: AlertController, public loadingController: LoadingController,public modalController:ModalController) {
+    public alertController: AlertController, public loadingController: LoadingController, public modalController: ModalController,
+    private camera: Camera, public paramServ: ParameterService,
+    public actionSheetController: ActionSheetController,
+    private file: File) {
 
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
@@ -40,9 +51,54 @@ export class LeaveEditPage implements OnInit {
     });
   }
 
+
+  @HostListener('change', ['$event'])
+  @HostListener('input', ['$event'])
+  onInput(event: any) {
+    this.dataChangeNotSaved = true;
+  }
+
+  @HostListener('window:beforeunload')
+  isDataSaved(): boolean {
+    if (this.dataChangeNotSaved) {
+      return this.presentAlertMessage();
+    }else{
+      return true;
+    }
+  } 
+
+  presentAlertMessage() {
+    let result = Observable.create(async (observer) => {
+      const alert = await this.alertController.create({
+        header: 'Warning',
+        message: 'Changes was not Updated. Sure you want to leave this page?',
+        buttons: [
+          {
+            text: 'Yes',
+            handler: () => {
+              observer.next(true);
+            }
+
+          },
+          {
+            text: 'No',
+            handler: () => {
+              observer.next(false)
+            }
+          }
+        ]
+      });
+      alert.present();
+    })
+
+    return result.pipe(map(res => res));
+  }
+  
+
+
   ngOnDestroy() {
-    if(this.resupmtion){
-      if(!this.resumptionUpdated){
+    if (this.resupmtion) {
+      if (!this.resumptionUpdated) {
         this.leaveApp.ResumptionInitiated = false;
       }
     }
@@ -53,7 +109,7 @@ export class LeaveEditPage implements OnInit {
     this.updateLeaveDetails();
   }
 
-  async openCalendarForActual(leaveLine:LeaveAppLineContract){
+  async openCalendarForActual(leaveLine: LeaveAppLineContract) {
     const options: CalendarModalOptions = {
       pickMode: 'range',
       title: 'Select Date',
@@ -76,7 +132,7 @@ export class LeaveEditPage implements OnInit {
   }
 
 
-  async openCalendar(leaveLine:LeaveAppLineContract) {
+  async openCalendar(leaveLine: LeaveAppLineContract) {
     const options: CalendarModalOptions = {
       pickMode: 'range',
       title: 'Select Date',
@@ -95,7 +151,7 @@ export class LeaveEditPage implements OnInit {
 
       leaveLine.StartDate = new Date(dataReturned.data.from.dateObj);
       leaveLine.EndDate = new Date(dataReturned.data.to.dateObj);
-      
+
       console.log(dataReturned)
     })
   }
@@ -110,11 +166,11 @@ export class LeaveEditPage implements OnInit {
     this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
       loading.dismiss();
       console.log(res);
-      
+
       if (!res) {
         this.presentAlert("Error", "Connection error")
       } else {
-        if(this.resupmtion){
+        if (this.resupmtion) {
           this.resumptionUpdated = true;
         }
         this.presentAlert("Success", "Leave Saved Successfully").then(() => {
@@ -140,4 +196,56 @@ export class LeaveEditPage implements OnInit {
     return await alert.present();
   }
 
+
+
+  pickImage(sourceType) {
+    const options: CameraOptions = {
+      quality: 100,
+      sourceType: sourceType,
+      destinationType: this.camera.DestinationType.FILE_URI,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE
+    }
+    this.camera.getPicture(options).then((imageData) => {
+      let atttachment = {} as LeaveAttachmentModel;
+
+      atttachment.Attachments = imageData;
+      atttachment.DataArea = this.paramServ.dataAreaObj.DataArea;
+      atttachment.FileExtension = "jpeg";
+      atttachment.TableNumber = this.leaveApp.Number;
+
+      this.axService.updateLeaveAttachment(atttachment).subscribe(res => {
+        console.log(res);
+      })
+      // imageData is either a base64 encoded string or a file URI
+      // If it's base64 (DATA_URL):
+      // let base64Image = 'data:image/jpeg;base64,' + imageData;
+    }, (err) => {
+      // Handle error
+    });
+  }
+
+  async selectImage() {
+    const actionSheet = await this.actionSheetController.create({
+      header: "Select Image source",
+      buttons: [{
+        text: 'Load from Library',
+        handler: () => {
+          this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY);
+        }
+      },
+      {
+        text: 'Use Camera',
+        handler: () => {
+          this.pickImage(this.camera.PictureSourceType.CAMERA);
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+      ]
+    });
+    await actionSheet.present();
+  }
 }
