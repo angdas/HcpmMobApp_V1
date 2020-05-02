@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
@@ -7,6 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentRequestType } from 'src/app/models/Document Request/documentRequestType.model';
 import { DocumentAddressModel } from 'src/app/models/Document Request/documentAddress.model';
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 @Component({
   selector: 'app-document-request-line',
   templateUrl: './document-request-line.page.html',
@@ -20,6 +22,7 @@ export class DocumentRequestLinePage implements OnInit {
 
   docRequestTypeList: DocumentRequestType[] = [];
   docReqAddressTypeList: DocumentAddressModel[] = [];
+  dataChangeNotSaved: boolean = false;
 
   constructor(public axService: AxService, public dataService: DataService, private activateRoute: ActivatedRoute, public router: Router,
     public loadingController: LoadingController, public alertController: AlertController, public toastController: ToastController) {
@@ -30,6 +33,51 @@ export class DocumentRequestLinePage implements OnInit {
   ngOnInit() {
     this.getRequestType();
   }
+
+
+  @HostListener('change', ['$event'])
+  @HostListener('input', ['$event'])
+  onInput(event: any) {
+    this.dataChangeNotSaved = true;
+  }
+
+  @HostListener('window:beforeunload')
+  isDataSaved(): boolean {
+    if (this.dataChangeNotSaved) {
+      return this.presentAlertMessage();
+    } else {
+      return true;
+    }
+  }
+
+  presentAlertMessage() {
+    let result = Observable.create(async (observer) => {
+      const alert = await this.alertController.create({
+        header: 'Warning',
+        message: 'Changes was not Updated. Sure you want to leave this page?',
+        buttons: [
+          {
+            text: 'Yes',
+            handler: () => {
+              observer.next(true);
+            }
+
+          },
+          {
+            text: 'No',
+            handler: () => {
+              observer.next(false)
+            }
+          }
+        ]
+      });
+      alert.present();
+    })
+
+    return result.pipe(map(res => res));
+  }
+
+
   ionViewWillEnter() {
     this.getServiceData();
   }

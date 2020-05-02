@@ -41,8 +41,10 @@ export class SettingsPage implements OnInit {
   }
 
   ngOnInit() {
-    if (this.paramServ.clientConfig)
+    this.clientConfig.instance = "LIVE";
+    if (this.paramServ.clientConfig){
       this.clientConfig = this.paramServ.clientConfig;
+    }
 
     console.log(this.clientConfig)
   }

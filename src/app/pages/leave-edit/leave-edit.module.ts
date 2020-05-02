@@ -7,11 +7,13 @@ import { IonicModule } from '@ionic/angular';
 
 import { LeaveEditPage } from './leave-edit.page';
 import { CalendarModule } from 'ion2-calendar';
+import { PendingChangesGuard } from 'src/app/providers/pending-changes.guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: LeaveEditPage
+    component: LeaveEditPage,
+    canDeactivate: [PendingChangesGuard]
   }
 ];
 
