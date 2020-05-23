@@ -5,12 +5,12 @@ import { ParameterService } from 'src/app/providers/parameterService/parameter.s
 import { StorageService } from 'src/app/providers/storageService/storage.service';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
-import { ProfileDetailsPage } from './profile-details/profile-details.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { Events } from 'src/app/providers/events/event.service';
+import { ProfileDetailsPage } from './profile-details/profile-details.page';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
