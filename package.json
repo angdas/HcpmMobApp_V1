@@ -23,6 +23,7 @@
     "@angular/router": "~9.0.4",
     "@capacitor/core": "1.5.0",
     "@ionic-native/app-version": "^5.22.0",
+    "@ionic-native/camera": "^5.26.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/file": "^5.22.0",
     "@ionic-native/file-opener": "^5.22.0",
