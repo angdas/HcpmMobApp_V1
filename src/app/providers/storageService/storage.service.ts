@@ -121,10 +121,18 @@ export class StorageService {
         observer.complete();
       }
     })
+    this.storage.get('hcpmWorkerEmployementList').then((data) => {
+      this.parameterservice.workerEmpList = data;
+      observer.next(data);
+      variables++;
+      if (variables == this.parameterservice.totalStorageVariables) {
+        observer.complete();
+      }
+    })
 
   })
 
-  setCompanyLogo(companylogo){
+  setCompanyLogo(companylogo) {
     this.storage.set('hcpmCompanyLogo', companylogo);
     this.parameterservice.companyLogo = companylogo;
   }
@@ -178,6 +186,11 @@ export class StorageService {
     this.parameterservice.emp = user;
   }
 
+  setEmployementList(employementList) {
+    this.storage.set('hcpmWorkerEmployementList', employementList);
+    this.parameterservice.workerEmpList = employementList;
+  }
+
   clearStorage() {
     let companyLogo = this.parameterservice.companyLogo
     this.storage.clear();
@@ -185,7 +198,7 @@ export class StorageService {
       this.setLoginCrendentials(this.parameterservice.loginCredentials);
       this.setURL(this.parameterservice.baseUrl);
     }
-    if (this.parameterservice.clientConfig){
+    if (this.parameterservice.clientConfig) {
       this.setClientConfig(this.parameterservice.clientConfig);
     }
     this.setCompanyLogo(companyLogo);

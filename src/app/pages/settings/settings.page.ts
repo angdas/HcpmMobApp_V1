@@ -11,6 +11,7 @@ import { ToastController, AlertController, LoadingController } from '@ionic/angu
 import { ClientConfigModel } from 'src/app/models/ClientConfig.model';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { Events } from 'src/app/providers/events/event.service';
+import { WorkerEmployementModel } from 'src/app/models/worker/WorkerEmployement.model';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
@@ -20,6 +21,8 @@ export class SettingsPage implements OnInit {
 
   @ViewChild('clientId', { static: false }) clientIdInput: IonInput;
   clientConfig: ClientConfigModel = {} as ClientConfigModel;
+  workerEmployementList: WorkerEmployementModel[] = [];
+  dataAreaObj:WorkerEmployementModel = {} as WorkerEmployementModel;
 
   versionNumber: any;
 
@@ -42,14 +45,18 @@ export class SettingsPage implements OnInit {
 
   ngOnInit() {
     this.clientConfig.instance = "LIVE";
-    if (this.paramServ.clientConfig){
+    if (this.paramServ.clientConfig) {
       this.clientConfig = this.paramServ.clientConfig;
     }
-
-    console.log(this.clientConfig)
   }
   ionViewWillEnter() {
-    this.clientIdInput.setFocus();
+    this.authenticated = this.paramServ.authenticated;
+    if(this.authenticated){
+      this.workerEmployementList = this.paramServ.workerEmpList;
+      this.dataAreaObj = this.paramServ.dataAreaObj;
+    }else{
+      this.clientIdInput.setFocus();
+    }
   }
 
   async getClientUrl() {
@@ -62,7 +69,7 @@ export class SettingsPage implements OnInit {
     this.axService.GetClientConfig(this.clientConfig).subscribe((res: ClientConfigModel) => {
       loading.dismiss();
       if (!res.api) {
-        this.presentAlert(res)
+        this.presentAlert("Error",res)
       } else {
         this.storageService.setClientConfig(this.clientConfig);
         this.axService.baseAddress = res.api;
@@ -81,13 +88,20 @@ export class SettingsPage implements OnInit {
     })
   }
 
-  async presentAlert(msg) {
+  async presentAlert(header,msg) {
     const alert = await this.alertController.create({
-      header: "Error",
+      header: header,
       message: msg,
       buttons: ["OK"]
     });
 
     await alert.present();
+  }
+
+  legalEntityChanged(){
+    console.log(this.dataAreaObj)
+    this.storageService.setDataArea(this.dataAreaObj);
+    this.presentAlert("Success","Legal Entity Changed");
+
   }
 }

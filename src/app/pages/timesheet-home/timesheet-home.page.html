@@ -16,8 +16,8 @@
 
 <ion-content>
 	<ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-		<ion-refresher-content pullingIcon="arrow-down-outline" pullingText="Pull to refresh" refreshingSpinner="circles"
-			refreshingText="Refreshing...">
+		<ion-refresher-content pullingIcon="arrow-down-outline" pullingText="Pull to refresh"
+			refreshingSpinner="circles" refreshingText="Refreshing...">
 		</ion-refresher-content>
 	</ion-refresher>
 
@@ -51,27 +51,29 @@
 	<ng-container *ngIf="pageType!='worker';else myWorkers">
 		<div *ngIf="showDetails;else noData">
 			<div *ngFor="let timesheet of timesheetList">
-				<div [ngSwitch]="selectedTab" style="margin-top: 10px;">
-					<div *ngSwitchCase="'all'">
-						<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
-					</div>
+				<ng-container *ngIf="!timesheet.IsDeleted">
+					<div [ngSwitch]="selectedTab" style="margin-top: 10px;">
+						<div *ngSwitchCase="'all'">
+							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+						</div>
 
-					<div *ngSwitchCase="'created'">
-						<div *ngIf="(timesheet.Status | uppercase) =='CREATED'">
-							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+						<div *ngSwitchCase="'created'">
+							<div *ngIf="(timesheet.Status | uppercase) =='CREATED'">
+								<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+							</div>
+						</div>
+						<div *ngSwitchCase="'approved'">
+							<div *ngIf="timesheet.Status=='Approved'">
+								<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+							</div>
+						</div>
+						<div *ngSwitchCase="'rejected'">
+							<div *ngIf="timesheet.Status=='Rejected'">
+								<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
+							</div>
 						</div>
 					</div>
-					<div *ngSwitchCase="'approved'">
-						<div *ngIf="timesheet.Status=='Approved'">
-							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
-						</div>
-					</div>
-					<div *ngSwitchCase="'rejected'">
-						<div *ngIf="timesheet.Status=='Rejected'">
-							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
-						</div>
-					</div>
-				</div>
+				</ng-container>
 			</div>
 		</div>
 

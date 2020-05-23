@@ -42,9 +42,9 @@ const routes: Routes = [
           { path: 'manager_document_request/:pageType',loadChildren: () => import('../document-request/document-request.module').then(m => m.DocumentRequestPageModule)},
           { path: 'manager_document_request_line/:pageType',loadChildren: () => import('../document-request-line/document-request-line.module').then(m => m.DocumentRequestLinePageModule)},
           { path: 'manager_document_request_add/:pageType',loadChildren: () => import('../document-request-add/document-request-add.module').then(m => m.DocumentRequestAddPageModule)},
-          { path: 'manager_settings/:pageType', loadChildren: () => import('../settings/settings.module').then(m => m.SettingsPageModule)},
+          { path: 'manager_settings', loadChildren: () => import('../settings/settings.module').then(m => m.SettingsPageModule)},
         ]
-      },
+      }
     ]
   }
 ];

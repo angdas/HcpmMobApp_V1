@@ -36,10 +36,10 @@ export class TimesheetHomeElementPage implements OnInit {
   }
 
   deleteLine(i) {
-    this.ConfirmationForDelete("Delete Line", "Are you sure you want to delete this timesheet line?", "line", i);
+    this.ConfirmationForDelete("Delete Timesheet Line", "Are you sure you want to delete this timesheet line?", "line", i);
   }
   deleteHeader() {
-    this.ConfirmationForDelete("Delete Header", "Are you sure you want to delete this timesheet?", "header");
+    this.ConfirmationForDelete("Delete Timesheet", "Are you sure you want to delete this timesheet?", "header");
   }
   submitTimesheet() {
     this.ConfirmationForSubmit();

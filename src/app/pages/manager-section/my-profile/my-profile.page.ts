@@ -82,7 +82,8 @@ export class MyProfilePage implements OnInit {
       this.isManager = this.parameterservice.isManager;
       this.imgSrc = this.emp.Images;
 
-
+      this.parameterservice.workerEmpList = res.WorkerEmployement;
+      this.storageService.setEmployementList(res.WorkerEmployement);
       if (res.WorkerEmployement.length == 1) {
         this.storageService.setDataArea(res.WorkerEmployement[0]);
       } else {

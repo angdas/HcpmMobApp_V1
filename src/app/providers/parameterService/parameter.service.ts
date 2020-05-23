@@ -24,12 +24,13 @@ export class ParameterService {
   public isManager:boolean;
   public loginCredentials:LoginModel;
   public dataAreaObj:WorkerEmployementModel;
+  public workerEmpList:WorkerEmployementModel[];
   public companyLogo:string;
 
   public colorList:any=[];
 
 
-  public totalStorageVariables: number = 11;
+  public totalStorageVariables: number = 12;
 
   public clientConfig:ClientConfigModel = {} as ClientConfigModel;
  
