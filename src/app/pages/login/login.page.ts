@@ -84,6 +84,7 @@ export class LoginPage implements OnInit {
       } else {
         this.dataService.setMyDetails(res);
         this.storageServ.setUserDetails(res);
+        this.paramService.isManager = res.IsManager;
         this.event.publish("isManager", res.IsManager);
         if (res.IsManager) {
           this.router.navigateByUrl("/tab/tabs/manager-profile");
