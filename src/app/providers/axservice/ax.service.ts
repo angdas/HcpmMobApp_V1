@@ -149,7 +149,8 @@ export class AxService {
         let url = this.baseAddress + "/api/HCPM/GetWorkerPayslip";
         let body = {
           "WorkerId": user,
-          "PeriodStartDate": period.toLocaleDateString()
+          "PeriodStartDate": period.toLocaleDateString(),
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
         };
         let httpOptions = {
           headers: new HttpHeaders({
@@ -273,7 +274,10 @@ export class AxService {
     this.validateToken$.subscribe(res => { }, error => { },
       () => {
         let url = this.baseAddress + "api/HCPM/GetWorkerProject";
-        let body = { "WorkerId": id };
+        let body = { 
+          "WorkerId": id,
+          "DataArea": this.parameterservice.dataAreaObj.DataArea
+       };
         let httpOptions = {
           headers: new HttpHeaders({
             'Content-Type': 'Application/json'

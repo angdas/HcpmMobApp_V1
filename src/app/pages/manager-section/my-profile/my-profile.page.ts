@@ -62,7 +62,7 @@ export class MyProfilePage implements OnInit {
       this.emp = res;
       this.dataService.setMyDetails(res);
       this.storageService.setUserDetails(res);
-      this.storageService.setDataArea(this.emp.WorkerEmployement[0]);
+      //this.storageService.setDataArea(this.emp.WorkerEmployement[0]);
       this.events.publish("isManager", this.emp.IsManager);
       this.parameterservice.isManager = this.emp.IsManager;
       this.isManager = this.parameterservice.isManager;
@@ -70,6 +70,7 @@ export class MyProfilePage implements OnInit {
 
       this.parameterservice.workerEmpList = res.WorkerEmployement;
       this.storageService.setEmployementList(res.WorkerEmployement);
+      if(res.WorkerEmployement.length == 0) return;
       if (res.WorkerEmployement.length == 1) {
         this.storageService.setDataArea(res.WorkerEmployement[0]);
       } else {
@@ -85,7 +86,7 @@ export class MyProfilePage implements OnInit {
           )
         })
         const alert = await this.alertCtrl.create({
-          header: 'Radio',
+          header: 'Select Legal Entity',
           backdropDismiss: false,
           inputs: inputArr,
           buttons: [

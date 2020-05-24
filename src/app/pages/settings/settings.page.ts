@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MenuController, IonInput } from '@ionic/angular';
+import { MenuController, IonInput, Platform } from '@ionic/angular';
 
 import { StorageService } from 'src/app/providers/storageService/storage.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -33,12 +33,15 @@ export class SettingsPage implements OnInit {
   constructor(public paramServ: ParameterService, public router: Router, private storageService: StorageService, 
     public axService: AxService,
     public events: Events, private appVersion: AppVersion,
-    public loadingController: LoadingController, private menuCtrl: MenuController,public alertServ:AlertService) {
+    public loadingController: LoadingController, private menuCtrl: MenuController,public alertServ:AlertService,
+    public platform: Platform) {
     this.menuCtrl.enable(false);
-
-    this.appVersion.getVersionNumber().then(res => {
-      this.versionNumber = res;
-    })
+    //console.log(this.platform.platforms());
+    if(this.platform.is('hybrid')) {
+      this.appVersion.getVersionNumber().then(res => {
+        this.versionNumber = res;
+      })
+    }    
 
     this.events.subscribe("authenticated", res => {
       this.authenticated = res;
