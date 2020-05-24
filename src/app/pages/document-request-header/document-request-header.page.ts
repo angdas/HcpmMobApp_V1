@@ -3,7 +3,6 @@ import { DataService } from 'src/app/providers/dataService/data.service';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { AlertController } from '@ionic/angular';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
 
 @Component({
@@ -19,7 +18,7 @@ export class DocumentRequestHeaderPage implements OnInit {
   colorList: any = [];
 
   constructor(public dataService: DataService, public axService: AxService, public router: Router, private activateRoute: ActivatedRoute,
-    public alertController: AlertController, public paramService: ParameterService, ) {
+    public paramService: ParameterService, ) {
 
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
     this.colorList = this.paramService.colorList;

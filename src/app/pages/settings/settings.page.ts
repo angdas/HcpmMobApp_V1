@@ -7,11 +7,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 
-import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { ClientConfigModel } from 'src/app/models/ClientConfig.model';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { Events } from 'src/app/providers/events/event.service';
 import { WorkerEmployementModel } from 'src/app/models/worker/WorkerEmployement.model';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
@@ -29,9 +30,10 @@ export class SettingsPage implements OnInit {
   toggle: any;
   prefersDark: any;
   authenticated: boolean;
-  constructor(public paramServ: ParameterService, public router: Router, private storageService: StorageService, public axService: AxService,
-    public events: Events, public alertController: AlertController, private activateRoute: ActivatedRoute, private appVersion: AppVersion,
-    public loadingController: LoadingController, private menuCtrl: MenuController) {
+  constructor(public paramServ: ParameterService, public router: Router, private storageService: StorageService, 
+    public axService: AxService,
+    public events: Events, private appVersion: AppVersion,
+    public loadingController: LoadingController, private menuCtrl: MenuController,public alertServ:AlertService) {
     this.menuCtrl.enable(false);
 
     this.appVersion.getVersionNumber().then(res => {
@@ -69,7 +71,7 @@ export class SettingsPage implements OnInit {
     this.axService.GetClientConfig(this.clientConfig).subscribe((res: ClientConfigModel) => {
       loading.dismiss();
       if (!res.api) {
-        this.presentAlert("Error",res)
+        this.alertServ.AlertMessage("Error",res)
       } else {
         this.storageService.setClientConfig(this.clientConfig);
         this.axService.baseAddress = res.api;
@@ -88,20 +90,9 @@ export class SettingsPage implements OnInit {
     })
   }
 
-  async presentAlert(header,msg) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: ["OK"]
-    });
-
-    await alert.present();
-  }
-
   legalEntityChanged(){
     console.log(this.dataAreaObj)
     this.storageService.setDataArea(this.dataAreaObj);
-    this.presentAlert("Success","Legal Entity Changed");
-
+    this.alertServ.AlertMessage("Success","Legal Entity Changed");
   }
 }

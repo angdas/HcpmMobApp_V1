@@ -4,7 +4,7 @@ import { DataService } from 'src/app/providers/dataService/data.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 
-import { ToastController, LoadingController, AlertController, ModalController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
@@ -15,6 +15,7 @@ import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.
 import { CalendarModal, CalendarModalOptions, CalendarResult } from 'ion2-calendar';
 
 import { startWith, map } from 'rxjs/operators';
+import { AlertService } from 'src/app/providers/alert.service';
 
 @Component({
   selector: 'app-leave-add',
@@ -36,11 +37,11 @@ export class LeaveAddPage implements OnInit {
   leaveLineAdd: boolean;
 
 
-  dataChangeNotSaved:boolean = false;
+  dataChangeNotSaved: boolean = false;
 
 
-  constructor(public dataService: DataService, public router: Router, public toastController: ToastController,
-    public alertController: AlertController, public axService: AxService, public paramService: ParameterService,
+  constructor(public dataService: DataService, public router: Router,
+    public alertServ: AlertService, public axService: AxService, public paramService: ParameterService,
     public loadingController: LoadingController, private activateRoute: ActivatedRoute, public modalController: ModalController) {
 
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
@@ -49,7 +50,7 @@ export class LeaveAddPage implements OnInit {
 
 
 
-  
+
   async openCalendar() {
     const options: CalendarModalOptions = {
       pickMode: 'range',
@@ -97,41 +98,16 @@ export class LeaveAddPage implements OnInit {
 
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
+    let ret;
     if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
+      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+        ret = res;
+      })
     }
-  } 
+    else ret = true;
 
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
+    return ret;
   }
-
-  
   submitLeave() {
     if (this.validator()) {
       if (this.leaveLineAdd) {
@@ -144,7 +120,7 @@ export class LeaveAddPage implements OnInit {
         var sameLeave = false;
         for (var i = 0; i < this.newLeave.LeaveApplicationLine.length; i++) {
           if (this.newLeave.LeaveApplicationLine[i].AbsenceCode == this.leaveLine.AbsenceCode) {
-            this.errorToast("Leave already applied for this leave type");
+            this.alertServ.errorToast("Leave already applied for this leave type");
             sameLeave = true;
             break;
           }
@@ -221,36 +197,25 @@ export class LeaveAddPage implements OnInit {
         })
 
         //this.dataService.setLeaveList(this.leaveList);
-        this.presentAlert("Success", "Leave Created Successfully").then(() => {
-          this.newLeave = {} as LeaveAppTableContract;
-          if (this.pageType == "manager") {
-            this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
-          } else {
-            this.router.navigateByUrl("leave-home");
-          }
-        })
+        this.alertServ.AlertMessage("Success", "Leave Created Successfully")
+        this.newLeave = {} as LeaveAppTableContract;
+        if (this.pageType == "manager") {
+          this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
+        } else {
+          this.router.navigateByUrl("leave-home");
+        }
       } else {
-        this.presentAlert("Error", res)
+        this.alertServ.errorToast(res)
       }
     }, error => {
       loading.dismiss();
-      this.presentAlert("Error", "Error Connecting to server, Please Try Again")
+      this.alertServ.errorToast("Error Connecting to server, Please Try Again")
     })
   }
   compareDate() {
     if (!this.leaveLine.StartDate || !this.leaveLine.EndDate) return false;
 
     return new Date(this.leaveLine.StartDate).getDate() == new Date(this.leaveLine.EndDate).getDate();
-  }
-
-  async presentAlert(header, msg) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: ['OK']
-    });
-
-    return await alert.present();
   }
 
   getLeaveType(date) {
@@ -269,25 +234,17 @@ export class LeaveAddPage implements OnInit {
 
   validator() {
     if (!this.leaveLine.AbsenceCode) {
-      this.errorToast("Leave Type Cann't be blank");
+      this.alertServ.errorToast("Leave Type Cann't be blank");
     } else if (!this.leaveLine.StartDate) {
-      this.errorToast("Start Date Cann't be blank");
+      this.alertServ.errorToast("Start Date Cann't be blank");
     } else if (!this.leaveLine.EndDate) {
-      this.errorToast("End Date Cann't be blank");
+      this.alertServ.errorToast("End Date Cann't be blank");
     } else if ((this.leaveLine.StartDate == this.leaveLine.EndDate) && (!this.leaveLine.Hours)) {
-      this.errorToast("Hours Cann't be blank");
+      this.alertServ.errorToast("Hours Cann't be blank");
     } else {
       return true;
     }
     return false;
-  }
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
   }
 }
 

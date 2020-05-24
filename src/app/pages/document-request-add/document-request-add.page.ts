@@ -10,8 +10,9 @@ import { DocumentRequestType } from 'src/app/models/Document Request/documentReq
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
 import { DocumentRequestLine } from 'src/app/models/Document Request/documentRequestLine.model';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { ToastController, LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { DocumentAddressModel } from 'src/app/models/Document Request/documentAddress.model';
+import { AlertService } from 'src/app/providers/alert.service';
 
 @Component({
   selector: 'app-document-request-add',
@@ -35,7 +36,7 @@ export class DocumentRequestAddPage implements OnInit {
   dataChangeNotSaved: boolean = false;
 
   constructor(public axService: AxService, public dataService: DataService, public paramService: ParameterService, public router: Router,
-    public loadingController: LoadingController, public alertController: AlertController, public toastController: ToastController,
+    public loadingController: LoadingController, public alertServ: AlertService,
     private activateRoute: ActivatedRoute) {
 
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
@@ -63,38 +64,15 @@ export class DocumentRequestAddPage implements OnInit {
 
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
+    let ret;
     if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    } else {
-      return true;
+      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+        ret = res;
+      })
     }
-  }
+    else ret = true;
 
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
+    return ret;
   }
 
   ngOnDestroy() {
@@ -128,7 +106,7 @@ export class DocumentRequestAddPage implements OnInit {
         var sameReq = false;
         for (var i = 0; i < this.newDocReq.HRRequestLine.length; i++) {
           if (this.newDocReq.HRRequestLine[i].DocumentRequestTypeCode == this.newDocLine.DocumentRequestTypeCode) {
-            this.errorToast("HR request already applied for this type");
+            this.alertServ.errorToast("HR request already applied for this type");
             sameReq = true;
             break;
           }
@@ -179,14 +157,12 @@ export class DocumentRequestAddPage implements OnInit {
         this.documentList = res;
         this.dataService.setDocumentDetailsList(this.documentList);
 
-        this.presentAlert("Success", "Document Request Submitted Successfully").then(() => {
-          if (this.pageType == "manager") {
-            this.router.navigateByUrl("/tab/tabs/manager-profile/manager_document_request/manager");
-          } else {
-            this.router.navigateByUrl("document-request");
-          }
-        })
-        console.log(res);
+        this.alertServ.AlertMessage("Success", "Document Request Submitted Successfully");
+        if (this.pageType == "manager") {
+          this.router.navigateByUrl("/tab/tabs/manager-profile/manager_document_request/manager");
+        } else {
+          this.router.navigateByUrl("document-request");
+        }
       }, error => {
 
       })
@@ -200,37 +176,18 @@ export class DocumentRequestAddPage implements OnInit {
 
     }, error => {
       loading.dismiss();
-      this.errorToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
-  async presentAlert(header, msg) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: ['OK']
-    });
-
-    return await alert.present();
-  }
-
 
   validator() {
     if (!this.newDocLine.DocumentRequestTypeCode) {
-      this.errorToast("Document Request Type Cann't be blank");
+      this.alertServ.errorToast("Document Request Type Cann't be blank");
     } else if (!this.newDocLine.DocumentRequestAddressCode) {
-      this.errorToast("Document Address Type Cann't be blank");
+      this.alertServ.errorToast("Document Address Type Cann't be blank");
     } else {
       return true;
     }
     return false;
-  }
-
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
   }
 }

@@ -4,8 +4,6 @@ import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
 import { Router } from '@angular/router';
-import * as moment from 'moment';
-import { ToastController, AlertController } from '@ionic/angular';
 import { TimesheetLine } from 'src/app/models/timesheet/tsLineListContact.interface';
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 class HoursDateModel {
@@ -28,8 +26,7 @@ export class TimesheetHeaderPage implements OnInit {
 
   isEditable: boolean;
 
-  constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
-    public alertController: AlertController, public toastController: ToastController) {
+  constructor(public dataService: DataService, public paramService: ParameterService, public router: Router) {
     this.colorList = this.paramService.colorList;
   }
 

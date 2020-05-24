@@ -24,6 +24,7 @@ import { PendingChangesGuard } from './providers/pending-changes.guard';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { AlertService } from './providers/alert.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -51,6 +52,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     DataService,
     Camera,
     AxService,
+    AlertService,
     Events,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

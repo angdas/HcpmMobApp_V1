@@ -3,7 +3,7 @@ import { DataService } from 'src/app/providers/dataService/data.service';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
-import { ToastController, LoadingController, AlertController, ModalController, ActionSheetController } from '@ionic/angular';
+import { LoadingController, ModalController, ActionSheetController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LeaveAppLineContract } from 'src/app/models/leave/leaveAppLineContract.interface';
 import { CalendarModalOptions, CalendarModal } from 'ion2-calendar';
@@ -11,8 +11,7 @@ import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { File } from '@ionic-native/file/ngx'
 import { LeaveAttachmentModel } from 'src/app/models/leave/leaveAttachment.model';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-leave-edit',
   templateUrl: './leave-edit.page.html',
@@ -27,11 +26,11 @@ export class LeaveEditPage implements OnInit {
 
   resupmtion: boolean;
   resumptionUpdated: boolean;
-  dataChangeNotSaved:boolean = false;
-  
+  dataChangeNotSaved: boolean = false;
+
 
   constructor(public dataService: DataService, public axService: AxService, public router: Router, private activateRoute: ActivatedRoute,
-    public alertController: AlertController, public loadingController: LoadingController, public modalController: ModalController,
+    public alertServ: AlertService, public loadingController: LoadingController, public modalController: ModalController,
     private camera: Camera, public paramServ: ParameterService,
     public actionSheetController: ActionSheetController,
     private file: File) {
@@ -60,41 +59,16 @@ export class LeaveEditPage implements OnInit {
 
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
+    let ret;
     if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
+      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+        ret = res;
+      })
     }
-  } 
+    else ret = true;
 
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
+    return ret;
   }
-  
-
 
   ngOnDestroy() {
     if (this.resupmtion) {
@@ -168,35 +142,23 @@ export class LeaveEditPage implements OnInit {
       console.log(res);
 
       if (!res) {
-        this.presentAlert("Error", "Connection error")
+        this.alertServ.errorToast("Connection error")
       } else {
         if (this.resupmtion) {
           this.resumptionUpdated = true;
         }
-        this.presentAlert("Success", "Leave Saved Successfully").then(() => {
-          if (this.pageType == "manager") {
-            this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
-          } else {
-            this.router.navigateByUrl("leave-home");
-          }
-        })
+        this.alertServ.AlertMessage("Success", "Leave Saved Successfully")
+        if (this.pageType == "manager") {
+          this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
+        } else {
+          this.router.navigateByUrl("leave-home");
+        }
+
       }
     }, error => {
-      this.presentAlert("Error", "Error While Updating Leave");
+      this.alertServ.errorToast("Error While Updating Leave");
     })
   }
-
-  async presentAlert(header, msg) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: ['OK']
-    });
-
-    return await alert.present();
-  }
-
-
 
   pickImage(sourceType) {
     const options: CameraOptions = {
