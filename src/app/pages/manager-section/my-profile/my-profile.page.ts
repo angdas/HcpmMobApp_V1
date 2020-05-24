@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { Events } from 'src/app/providers/events/event.service';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-my-profile',
   templateUrl: './my-profile.page.html',
@@ -21,9 +22,9 @@ export class MyProfilePage implements OnInit {
   imgSrc: any = null;
   emp: EmployeeModel = {} as EmployeeModel;
   isManager: boolean;
-  constructor(private sanitizer: DomSanitizer, private menuCtrl: MenuController, public dataService: DataService, public platform: Platform,
+  constructor(private sanitizer: DomSanitizer, public dataService: DataService, public platform: Platform,
     public router: Router, private storageService: StorageService, private parameterservice: ParameterService, public axService: AxService,
-    public events: Events, public alertCtrl: AlertController) {
+    public events: Events, public alertServ: AlertService,private alertCtrl:AlertController) {
 
   }
 
@@ -46,29 +47,14 @@ export class MyProfilePage implements OnInit {
   }
 
   async logout() {
-    const confirm = await this.alertCtrl.create({
-      header: "Logout",
-      message: "Sure you want to logout?",
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'OK',
-          handler: () => {
-            this.events.publish('authenticated', false);
-            this.parameterservice.authenticated = false;
-
-
-            this.storageService.clearStorage();
-            this.router.navigateByUrl("/login");
-          }
-        }
-      ]
-    });
-    confirm.present();
+    this.alertServ.AlertConfirmation("Logout", "Sure you want to logout?").subscribe(res => {
+      if (res) {
+        this.events.publish('authenticated', false);
+        this.parameterservice.authenticated = false;
+        this.storageService.clearStorage();
+        this.router.navigateByUrl("/login");
+      }
+    })
   }
   getWorkerDetails() {
     this.axService.getWorkerDetails(this.parameterservice.email).subscribe(async (res) => {

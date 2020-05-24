@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DataService } from 'src/app/providers/dataService/data.service';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
-import { AlertController } from '@ionic/angular';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 
 import { Router, ActivatedRoute } from '@angular/router';
@@ -21,7 +20,7 @@ export class LeaveLinePage implements OnInit {
   colorList: any = [];
 
   constructor(public dataService:DataService,public axService:AxService,public router: Router,private activateRoute: ActivatedRoute,
-    public alertController: AlertController,public paramService: ParameterService,) {
+   public paramService: ParameterService,) {
 
       this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
       this.colorList = this.paramService.colorList;
@@ -57,15 +56,4 @@ export class LeaveLinePage implements OnInit {
       this.router.navigateByUrl("leave-add");
     }
   }
-  async presentAlert(header, msg) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: ['OK']
-    });
-
-    return await alert.present();
-  }
-
-
 }

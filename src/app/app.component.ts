@@ -8,10 +8,11 @@ import { ParameterService } from './providers/parameterService/parameter.service
 import { StorageService } from './providers/storageService/storage.service';
 import { AxService } from './providers/axservice/ax.service';
 import { MenuController } from '@ionic/angular';
-import { ToastController, LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { EmployeeModel } from './models/worker/worker.interface';
 import { DataService } from './providers/dataService/data.service';
 import { Events } from './providers/events/event.service';
+import { AlertService } from './providers/alert.service';
 
 @Component({
   selector: 'app-root',
@@ -29,9 +30,9 @@ export class AppComponent {
   constructor(public router: Router,
     private platform: Platform,
     private splashScreen: SplashScreen, private storageService: StorageService, private menuCtrl: MenuController,
-    public alertCtrl: AlertController,
+    public alertServ:AlertService,
     private statusBar: StatusBar, private parameterservice: ParameterService, public loadingController: LoadingController,
-    public events: Events, public axService: AxService, public alertController: AlertController, public dataService: DataService
+    public events: Events, public axService: AxService, public dataService: DataService
   ) {
     this.initializeApp();
     this.initializeStorageVariables();
@@ -60,40 +61,31 @@ export class AppComponent {
   }
 
 
-
-  openPage(page) {
-    if (page != '' && page) {
-      this.router.navigateByUrl(page)
-    } else {
-      this.logout();
-    }
-  }
-
-  async logout() {
-    const confirm = await this.alertCtrl.create({
-      header: "Logout",
-      message: "Sure you want to logout?",
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'OK',
-          handler: () => {
-            this.events.publish('authenticated', false);
-            this.parameterservice.authenticated = false;
-            this.authenticated = false;
-            this.storageService.clearStorage();
-            this.storageService.setEmail("");
-            this.router.navigateByUrl("/login");
-          }
-        }
-      ]
-    });
-    confirm.present();
-  }
+  // async logout() {
+  //   const confirm = await this.alertCtrl.create({
+  //     header: "Logout",
+  //     message: "Sure you want to logout?",
+  //     buttons: [
+  //       {
+  //         text: 'Cancel',
+  //         handler: () => {
+  //         }
+  //       },
+  //       {
+  //         text: 'OK',
+  //         handler: () => {
+  //           this.events.publish('authenticated', false);
+  //           this.parameterservice.authenticated = false;
+  //           this.authenticated = false;
+  //           this.storageService.clearStorage();
+  //           this.storageService.setEmail("");
+  //           this.router.navigateByUrl("/login");
+  //         }
+  //       }
+  //     ]
+  //   });
+  //   confirm.present();
+  // }
 
   async initializeStorageVariables() {
     const loading = await this.loadingController.create({
@@ -107,7 +99,7 @@ export class AppComponent {
         loading.dismiss();
         console.log(this.parameterservice)
         if (!this.parameterservice.baseUrl) {
-          this.presentErrorAlert("Please configure your environment");
+          this.alertServ.AlertMessage("Error","Please configure your environment");
           this.router.navigateByUrl("/settings");
         } else {
           if (this.parameterservice.authenticated) {
@@ -127,7 +119,7 @@ export class AppComponent {
               }
 
             }, error => {
-              this.presentErrorAlert("Error Connecting To Server, Please Login Again");
+              this.alertServ.AlertMessage("Error","Error Connecting To Server, Please Login Again");
               this.router.navigateByUrl("/login");
             })
           } else {
@@ -138,15 +130,5 @@ export class AppComponent {
         }
 
       });
-  }
-
-  async presentErrorAlert(msg) {
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: msg,
-      buttons: ['OK']
-    });
-
-    await alert.present();
   }
 }

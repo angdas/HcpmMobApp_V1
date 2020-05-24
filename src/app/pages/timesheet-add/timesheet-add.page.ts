@@ -2,14 +2,9 @@ import { Component, OnInit, ChangeDetectionStrategy, HostListener, SimpleChanges
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
-import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
-import * as moment from 'moment';
-import { ToastController, AlertController, LoadingController, ModalController } from '@ionic/angular';
-import { Observable } from 'rxjs';
-import { FormControl, NgModel } from '@angular/forms';
-import { startWith, map } from 'rxjs/operators';
+import { Router, ActivatedRoute } from '@angular/router';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { TimesheetProject } from 'src/app/models/timesheet/tsProject.interface';
-import { TimesheetActivity } from 'src/app/models/timesheet/tsActivity.interface';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { PopoverController } from '@ionic/angular';
@@ -20,6 +15,7 @@ import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 import { TimesheetLine } from 'src/app/models/timesheet/tsLineListContact.interface';
 import { SearchPage } from 'src/app/common/search/search.page';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-timesheet-add',
   templateUrl: './timesheet-add.page.html',
@@ -49,7 +45,8 @@ export class TimesheetAddPage implements OnInit {
 
   tsLineAdd: boolean;
   constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
-    public alertController: AlertController, public toastController: ToastController, public axService: AxService,
+    private alertServ: AlertService,
+    public axService: AxService,
     public popoverController: PopoverController, public loadingController: LoadingController, private activateRoute: ActivatedRoute,
     private location: Location, public modalController: ModalController) {
 
@@ -64,38 +61,15 @@ export class TimesheetAddPage implements OnInit {
 
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
+    let ret;
     if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
+      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+        ret = res;
+      })
     }
-  } 
+    else ret = true;
 
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
+    return ret;
   }
 
   ngOnInit() {
@@ -309,7 +283,7 @@ export class TimesheetAddPage implements OnInit {
           this.timesheetList = res;
           this.dataService.setTimesheetList(this.timesheetList);
         }, (error) => {
-          console.log(error);
+          this.alertServ.errorToast("Connection Error");
         });
 
         // this.dataService.setTimesheetList(this.timesheetList);
@@ -325,32 +299,18 @@ export class TimesheetAddPage implements OnInit {
       }
     }, error => {
       loading.dismiss();
-      this.errorToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
   validator() {
     if (!this.newLine.ProjId) {
-      this.errorToast("Project Cannot Be blank");
+      this.alertServ.errorToast("Project Cannot Be blank");
     }
-    // else if (!this.newLine.ProjActivityId) {
-    //   this.errorToast("Activity Cannot Be blank");
-    // }
-    // else if (!this.newLine.CategoryId) {
-    //   this.errorToast("Category Cannot Be blank");
-    // }
     else {
       return true
     }
     return false;
-  }
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
   }
 
   async presentModal() {

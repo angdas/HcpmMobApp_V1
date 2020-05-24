@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonInput, ToastController, MenuController, AlertController } from '@ionic/angular';
+import { IonInput, MenuController } from '@ionic/angular';
 import { LoginModel } from 'src/app/models/login.model';
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { DataService } from 'src/app/providers/dataService/data.service';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { Events } from 'src/app/providers/events/event.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AlertService } from 'src/app/providers/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -26,12 +27,10 @@ export class LoginPage implements OnInit {
   savePass: boolean;
 
   imgSrc: any;
-  constructor(public axservice: AxService, public router: Router, public toastController: ToastController,
+  constructor(public axservice: AxService, public router: Router,
     public storageServ: StorageService, public paramService: ParameterService, public dataService: DataService,
-    private menuCtrl: MenuController, public event: Events, private sanitizer: DomSanitizer, public alertController: AlertController) {
-    this.menuCtrl.enable(false);
+    public event: Events, private sanitizer: DomSanitizer, public alertServ: AlertService) {
 
-    this.menuCtrl.enable(false);
   }
 
   ngOnInit() {
@@ -67,7 +66,7 @@ export class LoginPage implements OnInit {
       } else {
         this.event.publish('authenticated', false);
         this.storageServ.setAuthenticated(false);
-        this.errorToast("Invalid Credentials")
+        this.alertServ.errorToast("Invalid Credentials")
       }
     }, error => {
       this.loginSpinner = false;
@@ -79,7 +78,7 @@ export class LoginPage implements OnInit {
       console.log(res);
       if (!res.Name) {
         this.storageServ.setAuthenticated(false);
-        this.errorToast("Worker not found");
+        this.alertServ.errorToast("Worker not found");
         this.event.publish('authenticated', false);
       } else {
         this.dataService.setMyDetails(res);
@@ -96,16 +95,6 @@ export class LoginPage implements OnInit {
     }, (error) => {
 
     })
-  }
-
-
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
   }
 
   showPasswordBtn() {

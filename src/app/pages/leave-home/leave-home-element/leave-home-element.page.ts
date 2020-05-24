@@ -2,9 +2,10 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { AxService } from 'src/app/providers/axservice/ax.service';
-import { ToastController, LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'leave-home-element',
   templateUrl: './leave-home-element.page.html',
@@ -17,8 +18,8 @@ export class LeaveHomeElementPage implements OnInit {
 
   visible: boolean = false;
   constructor(public router: Router, public dataService: DataService, public axService: AxService,
-    public paramService:ParameterService,
-    public alertController: AlertController, public toastController: ToastController, public loadingController: LoadingController) { }
+    public paramService: ParameterService,
+    public alertServ: AlertService, public loadingController: LoadingController) { }
 
   ngOnInit() {
 
@@ -76,11 +77,11 @@ export class LeaveHomeElementPage implements OnInit {
     await loading.present();
     this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
       loading.dismiss();
-      this.presentToast("Leave Deleted");
+      this.alertServ.errorToast("Leave Deleted");
     }, error => {
 
       loading.dismiss();
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
@@ -95,98 +96,56 @@ export class LeaveHomeElementPage implements OnInit {
     this.leaveApp.IsEditable = false;
     this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
       loading.dismiss();
-      this.presentToast("Leave Submitted");
+      this.alertServ.errorToast("Leave Submitted");
     }, error => {
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
   async presentAlertConfirmation(header, msg, type, i = null) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: [
-        {
-          text: 'Yes',
-          handler: () => {
-            if (type == "deleteLine") {
-              if (this.leaveApp.LeaveApplicationLine.length == 1) {
-                this.leaveApp.IsDeleted = true;
-              } else {
-                this.leaveApp.LeaveApplicationLine.splice(i, 1);
-              }
-
-              console.log(this.leaveApp)
-              this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
-                this.presentToast("Leave Line Deleted");
-              }, error => {
-                this.presentToast("Connection Error");
-              })
-
-            } else if (type == "delete") {
-              this.deleteLeaveCall();
-            } else {
-              this.submitLeaveCall();
-            }
+    this.alertServ.AlertConfirmation(header, msg).subscribe(res => {
+      if (res) {
+        if (type == "deleteLine") {
+          if (this.leaveApp.LeaveApplicationLine.length == 1) {
+            this.leaveApp.IsDeleted = true;
+          } else {
+            this.leaveApp.LeaveApplicationLine.splice(i, 1);
           }
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-          handler: (blah) => {
-            console.log('Confirm Cancel');
-          }
+
+          console.log(this.leaveApp)
+          this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
+            this.alertServ.errorToast("Leave Line Deleted");
+          }, error => {
+            this.alertServ.errorToast("Connection Error");
+          })
+
+        } else if (type == "delete") {
+          this.deleteLeaveCall();
+        } else {
+          this.submitLeaveCall();
         }
-      ]
-    });
-
-    await alert.present();
+      }
+    })
   }
-
-  async presentToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
-  }
-
 
   async approvalAlertConfirmation(header, msg, type) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      inputs: [
-        {
-          name: 'workflowRemarks',
-          type: 'text',
-          placeholder: 'Workflow Remarks'
-        },
+    let inputArr = [
+      {
+        name: 'workflowRemarks',
+        type: 'text',
+        placeholder: 'Workflow Remarks'
+      },
 
-      ],
-      buttons: [
-        {
-          text: 'Yes',
-          handler: (data) => {
-            if (type == "approve") {
-              this.approveLeaveServiceCall(data.workflowRemarks)
-            } else {
-              this.rejectLeaveServiceCall(data.workflowRemarks);
-            }
-          }
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-          handler: (blah) => {
-            console.log('Confirm Cancel');
-          }
+    ];
+    this.alertServ.ApprovalAlertConfirmation(header, msg, inputArr).subscribe(res => {
+      if (res) {
+        if (type == "approve") {
+          this.approveLeaveServiceCall(res.workflowRemarks)
+        } else {
+          this.rejectLeaveServiceCall(res.workflowRemarks);
         }
-      ]
-    });
-
-    await alert.present();
+      }
+    })
   }
 
   async approveLeaveServiceCall(workflowRemarks) {
@@ -202,9 +161,9 @@ export class LeaveHomeElementPage implements OnInit {
     this.axService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
       loading.dismiss();
       this.leaveApp.InApprovalState = true;
-      this.presentToast("Leave Approved successfully");
+      this.alertServ.errorToast("Leave Approved successfully");
     }, error => {
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
       loading.dismiss();
     })
   }
@@ -221,10 +180,10 @@ export class LeaveHomeElementPage implements OnInit {
     this.axService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
       loading.dismiss();
       this.leaveApp.InApprovalState = true;
-      this.presentToast("Leave Rejected");
+      this.alertServ.errorToast("Leave Rejected");
       console.log(res);
     }, error => {
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
       loading.dismiss();
     })
   }

@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { AxService } from 'src/app/providers/axservice/ax.service';
-import { LoadingController, AlertController, ModalController, MenuController } from '@ionic/angular';
+import { LoadingController, ModalController, MenuController } from '@ionic/angular';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { StorageService } from 'src/app/providers/storageService/storage.service';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppVersion } from '@ionic-native/app-version/ngx';
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { Events } from 'src/app/providers/events/event.service';
 import { ProfileDetailsPage } from './profile-details/profile-details.page';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -28,8 +28,7 @@ export class HomePage implements OnInit {
 
 
   constructor(public axservice: AxService, public events: Events, public paramService: ParameterService, private menuCtrl: MenuController,
-    public alertController: AlertController, private sanitizer: DomSanitizer, private activateRoute: ActivatedRoute,
-    public alertCtrl: AlertController,
+    public alertServ: AlertService, private sanitizer: DomSanitizer, private activateRoute: ActivatedRoute,
     public loadingController: LoadingController, public storageServ: StorageService, public modalController: ModalController,
     public router: Router, public dataService: DataService) {
 
@@ -95,7 +94,7 @@ export class HomePage implements OnInit {
       this.getLeaveBalanceDetails();
     }, (error) => {
       loading.dismiss();
-      this.presentErrorAlert("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
   getLeaveBalanceDetails() {
@@ -103,19 +102,10 @@ export class HomePage implements OnInit {
       res => {
         this.leaveBalance = res;
       }, error => {
-        this.presentErrorAlert("Error While Retriving Leave Balanace Details");
+        this.alertServ.errorToast("Error While Retriving Leave Balanace Details");
       });
   }
 
-  async presentErrorAlert(msg) {
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: msg,
-      buttons: ['OK']
-    });
-
-    await alert.present();
-  }
 
 
   public getImageStr() {
@@ -151,28 +141,15 @@ export class HomePage implements OnInit {
     }, 2000);
   }
   async logout() {
-    const confirm = await this.alertCtrl.create({
-      header: "Logout",
-      message: "Sure you want to logout?",
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'OK',
-          handler: () => {
-            this.events.publish('authenticated', false);
-            this.paramService.authenticated = false;
-            this.authenticated = false;
-            this.storageServ.clearStorage();
-            this.router.navigateByUrl("/login");
-          }
-        }
-      ]
-    });
-    confirm.present();
+    this.alertServ.AlertConfirmation("Logout","Sure you want to logout?").subscribe(res=>{
+      if(res){
+        this.events.publish('authenticated', false);
+        this.paramService.authenticated = false;
+        this.authenticated = false;
+        this.storageServ.clearStorage();
+        this.router.navigateByUrl("/login");
+      }
+    })
   }
 
   goBack(){

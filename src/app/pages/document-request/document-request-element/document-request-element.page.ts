@@ -5,6 +5,7 @@ import { ToastController, AlertController, LoadingController } from '@ionic/angu
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { AlertService } from 'src/app/providers/alert.service';
 
 @Component({
   selector: 'document-request-element',
@@ -17,8 +18,8 @@ export class DocumentRequestElementPage implements OnInit {
   @Input('pageType') pageType: any;
 
   constructor(public router: Router, public dataService: DataService, public axService: AxService,
-    public paramService:ParameterService,
-    public alertController: AlertController, public toastController: ToastController, public loadingController: LoadingController) {
+    public paramService: ParameterService,
+    public alertServ: AlertService, public loadingController: LoadingController) {
 
   }
 
@@ -42,10 +43,10 @@ export class DocumentRequestElementPage implements OnInit {
     this.documentReq.IsDeleted = true;
     this.axService.updateDocumentRequest(this.documentReq).subscribe(res => {
       loading.dismiss();
-      this.presentToast("Document Deleted");
+      this.alertServ.errorToast("Document Deleted");
     }, error => {
       this.documentReq.IsDeleted = false;
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
@@ -59,50 +60,26 @@ export class DocumentRequestElementPage implements OnInit {
     this.documentReq.IsEditable = false;
     this.documentReq.Status = "SUBMITTED";
     this.axService.updateDocumentRequest(this.documentReq).subscribe(res => {
-      loading.dismiss();      
-      this.presentToast("Request Submitted successfully");
+      loading.dismiss();
+      this.alertServ.errorToast("Request Submitted successfully");
     }, error => {
       loading.dismiss();
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
   async presentAlertConfirmation(header, msg, type) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      buttons: [
-        {
-          text: 'Yes',
-          handler: () => {
-            if (type == "delete") {
-              this.deleteRequestCall()
-            } else {
-              this.submitRequestCall();
-            }
-          }
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-          handler: (blah) => {
-            console.log('Confirm Cancel');
-          }
+    this.alertServ.AlertConfirmation(header, msg).subscribe(res => {
+      if (res) {
+        if (type == "delete") {
+          this.deleteRequestCall()
+        } else {
+          this.submitRequestCall();
         }
-      ]
-    });
-
-    await alert.present();
+      }
+    })
   }
 
-  async presentToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
-  }
   gotoRequestLinePage() {
     this.dataService.setDocumentDetails(this.documentReq);
     if (this.pageType == 'worker') {
@@ -113,40 +90,23 @@ export class DocumentRequestElementPage implements OnInit {
   }
 
   async approvalAlertConfirmation(header, msg, type) {
+    let inputArr = [
+      {
+        name: 'workflowRemarks',
+        type: 'text',
+        placeholder: 'Workflow Remarks'
+      },
 
-    const alert = await this.alertController.create({
-      header: header,
-      message: msg,
-      inputs: [
-        {
-          name: 'workflowRemarks',
-          type: 'text',
-          placeholder: 'Workflow Remarks'
-        },
-
-      ],
-      buttons: [
-        {
-          text: 'Yes',
-          handler: (data) => {
-            if (type == "approve") {
-              this.approveDocumentReqServiceCall(data.workflowRemarks)
-            } else {
-              this.rejectDocumentReqServiceCall(data.workflowRemarks);
-            }
-          }
-        },
-        {
-          text: 'No',
-          role: 'cancel',
-          handler: (blah) => {
-            console.log('Confirm Cancel');
-          }
+    ];
+    this.alertServ.ApprovalAlertConfirmation(header, msg,inputArr).subscribe(res => {
+      if (res) {
+        if (type == "approve") {
+          this.approveDocumentReqServiceCall(res.workflowRemarks)
+        } else {
+          this.rejectDocumentReqServiceCall(res.workflowRemarks);
         }
-      ]
-    });
-
-    await alert.present();
+      }
+    })
   }
   async approveDocumentReqServiceCall(workflowRemarks) {
     const loading = await this.loadingController.create({
@@ -161,12 +121,12 @@ export class DocumentRequestElementPage implements OnInit {
     this.documentReq.ApproveWorker = this.paramService.emp.WorkerId;
     this.axService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
       loading.dismiss();
-      this.presentToast("Request Approved successfully");
+      this.alertServ.errorToast("Request Approved successfully");
       this.documentReq.InApprovalState = true;
       console.log(res);
     }, error => {
       loading.dismiss();
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
 
@@ -185,11 +145,11 @@ export class DocumentRequestElementPage implements OnInit {
     this.axService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
       loading.dismiss();
       this.documentReq.InApprovalState = true;
-      this.presentToast("Request Rejected");
+      this.alertServ.errorToast("Request Rejected");
       console.log(res);
     }, error => {
       loading.dismiss();
-      this.presentToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
   approveRequest() {

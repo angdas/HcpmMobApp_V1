@@ -3,15 +3,11 @@ import { DataService } from 'src/app/providers/dataService/data.service';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
-import { Platform, ModalController } from '@ionic/angular';
-import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { Observable } from 'rxjs';
-import { FormControl } from '@angular/forms';
-import { startWith, map } from 'rxjs/operators';
 import { TimesheetProject } from 'src/app/models/timesheet/tsProject.interface';
-import { TimesheetActivity } from 'src/app/models/timesheet/tsActivity.interface';
 
 import { AxService } from 'src/app/providers/axservice/ax.service';
 import { PopoverController } from '@ionic/angular';
@@ -19,11 +15,11 @@ import { TimesheetCategory } from 'src/app/models/timesheet/tsCategory.interface
 import { CommentPageForLine } from './comment/comment.page';
 
 import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
-import { Location } from '@angular/common';
 import { TimesheetLine } from 'src/app/models/timesheet/tsLineListContact.interface';
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 import { Events } from 'src/app/providers/events/event.service';
 import { SearchPage } from 'src/app/common/search/search.page';
+import { AlertService } from 'src/app/providers/alert.service';
 @Component({
   selector: 'app-timesheet-line',
   templateUrl: './timesheet-line.page.html',
@@ -53,8 +49,8 @@ export class TimesheetLinePage implements OnInit {
 
   
   constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
-    public alertController: AlertController, public toastController: ToastController, public axService: AxService,
-    public popoverController: PopoverController, public events: Events, private location: Location,
+    public axService: AxService,private alertServ:AlertService,
+    public popoverController: PopoverController, public events: Events,
     public modalController:ModalController,
     public loadingController: LoadingController) {
 
@@ -77,43 +73,16 @@ export class TimesheetLinePage implements OnInit {
 
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
+    let ret;
     if (this.dataChangeNotSaved) {
-      return this.presentAlertMessage();
-    }else{
-      return true;
+      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+        ret = res;
+      })
     }
-  } 
+    else ret = true;
 
-  presentAlertMessage() {
-    let result = Observable.create(async (observer) => {
-      const alert = await this.alertController.create({
-        header: 'Warning',
-        message: 'Changes was not Updated. Sure you want to leave this page?',
-        buttons: [
-          {
-            text: 'Yes',
-            handler: () => {
-              observer.next(true);
-            }
-
-          },
-          {
-            text: 'No',
-            handler: () => {
-              observer.next(false)
-            }
-          }
-        ]
-      });
-      alert.present();
-    })
-
-    return result.pipe(map(res => res));
+    return ret;
   }
-
-
-
-
 
   getTSLineData() {
     this.sub0 = this.dataService.getTimesheetHeader$.subscribe(res => {
@@ -303,33 +272,25 @@ export class TimesheetLinePage implements OnInit {
     }, error => {
       loading.dismiss();
       console.log(error);
-      this.errorToast("Connection Error");
+      this.alertServ.errorToast("Connection Error");
     })
   }
   validator() {
     if (!this.tsLine.ProjId) {
-      this.errorToast("Project Cannot Be blank");
+      this.alertServ.errorToast("Project Cannot Be blank");
     }
     else if (!this.tsLine.ProjActivityId) {
-      this.errorToast("Activity Cannot Be blank");
+      this.alertServ.errorToast("Activity Cannot Be blank");
     }
     // else if (!this.tsLine.CategoryId) {
-    //   this.errorToast("Category Cannot Be blank");
+    //   this.alertServ.errorToast("Category Cannot Be blank");
     // }
     else {
       return true
     }
     return false;
   }
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
-  }
-
+ 
   onEnter(index){
     for(let i=1;i<8;i++){
       if(i==index){
