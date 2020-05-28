@@ -7,7 +7,6 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
   <ion-list *ngFor="let reqLine of documentReq.HRRequestLine,let i=index">
     <div *ngIf="!reqLine.IsDeleted">
@@ -20,8 +19,6 @@
       </div>
     </div>
   </ion-list>
-
-
   <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addRequestLine()">
     <ion-fab-button size="small" [disabled]="!editable">
       <ion-icon name="add"></ion-icon>

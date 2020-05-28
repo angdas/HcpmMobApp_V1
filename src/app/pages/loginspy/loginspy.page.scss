@@ -1,0 +1,36 @@
+.logo {
+    width: 200px;
+    height: 100px;
+  }
+  
+  .im {
+    width: 22px;
+  }
+  .pd {
+    --padding-top: 50px;
+    --padding-bottom: 50px;
+  }
+  .font {
+    font-size: 23px;
+  }
+  ion-text > div {
+    --padding-start: 80px;
+    /*--color: l;*/
+  }
+  // ion-input{
+  // --background: #ccc;
+  
+  // }
+  
+  .settings {
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    ion-icon {
+      font-size: 22px;
+      position: absolute;
+      right: 60px;
+      bottom: -2px;
+    }
+  }
+  

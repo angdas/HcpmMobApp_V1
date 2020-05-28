@@ -1,54 +1,112 @@
-import { Component, OnInit, Injector } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Component, OnInit } from '@angular/core';
+import { AxService } from 'src/app/providers/axservice/ax.service';
+import { LoadingController, ModalController, MenuController } from '@ionic/angular';
+import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { StorageService } from 'src/app/providers/storageService/storage.service';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
+import { DataService } from 'src/app/providers/dataService/data.service';
 import { Events } from 'src/app/providers/events/event.service';
 import { ProfileDetailsPage } from './profile-details/profile-details.page';
 import { AlertService } from 'src/app/providers/alert.service';
-import { BasePage } from '../base/base.page';
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage extends BasePage implements OnInit {
-  
-  public emp: EmployeeModel = {} as EmployeeModel;
-  public leaveBalance: LeaveBalanceContract[];
-  public imgSrc: string;
-  public pageType: any;
+export class HomePage implements OnInit {
 
-  constructor(injector: Injector,
-    public events: Events,     
-    public alertServ: AlertService, 
-    private sanitizer: DomSanitizer, 
-    private activateRoute: ActivatedRoute,
-    public router: Router) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+  authenticated: boolean;
+  emp: EmployeeModel = {} as EmployeeModel;
+  toggleDetails: any;
+  leaveBalance: LeaveBalanceContract = {} as LeaveBalanceContract;
+
+  imgSrc: string;
+  pageType: any;
+
+
+  constructor(public axservice: AxService, public events: Events, public paramService: ParameterService, private menuCtrl: MenuController,
+    public alertServ: AlertService, private sanitizer: DomSanitizer, private activateRoute: ActivatedRoute,
+    public loadingController: LoadingController, public storageServ: StorageService, public modalController: ModalController,
+    public router: Router, public dataService: DataService) {
+
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+
+    this.events.subscribe("authenticated", res => {
+      if (res) {
+        this.authenticated = true;
+      } else {
+        this.authenticated = false;
+        paramService.authenticated = false;
+        storageServ.clearStorage();
+      }
+    })
   }
 
   ngOnInit() {
-    
+    this.authenticated = this.paramService.authenticated
+    if (this.authenticated && this.pageType != "manager") {
+      this.getWorkerDetails();
+    }
+  }
+  ionViewWillEnter() {
+    if (this.pageType == "manager") {
+      this.setManagerDetails();
+      this.getLeaveBalanceDetails();
+    }
   }
 
-  ionViewWillEnter() {
-    this.emp = this.dataSPYService.worker;
-    this.imgSrc = this.dataSPYService.worker.Images;
-    this.leaveBalance = this.dataSPYService.leaveBalance;
-    this.getLeaveBalance();
+  setManagerDetails() {
+    this.dataService.getMyDetails$.subscribe(res => {
+      this.emp = res;
+      this.imgSrc = this.emp.Images;
+    })
   }
-  
-  getLeaveBalance() {
-    this.apiService.getLeaveType(this.dataSPYService.worker.WorkerId).subscribe(res => {
+  isManager(res, isRefresh) {
+    if (!isRefresh) {
+      this.events.publish("isManager",res);
+      //this.router.navigateByUrl("/tab/tabs/manager-profile");
+
+    }
+  }
+  async getWorkerDetails(isRefresh: boolean = false) {
+    const loading = await this.loadingController.create({
+      spinner: "lines",
+      duration: 4000,
+      message: 'Please wait...',
+    });
+    loading.present();
+    this.axservice.getWorkerDetails(this.paramService.email).subscribe(res => {
+
+      loading.dismiss();
       console.log(res);
-      this.dataSPYService.leaveBalance = res;
-      this.storageService.setLeaveBalance(res);
-      this.leaveBalance = res;
-    });    
+      this.emp = res;
+      this.dataService.setMyDetails(res);
+      this.storageServ.setUserDetails(res);
+      this.storageServ.setDataArea(this.emp.WorkerEmployement[0]);
+
+      this.imgSrc = this.emp.Images;
+      this.paramService.joiningDate = this.emp.JoiningDate
+
+      this.isManager(res.IsManager, isRefresh);
+      this.getLeaveBalanceDetails();
+    }, (error) => {
+      loading.dismiss();
+      this.alertServ.errorToast("Connection Error");
+    })
   }
+  getLeaveBalanceDetails() {
+    this.axservice.getLeaveType(this.paramService.emp.WorkerId).subscribe(
+      res => {
+        this.leaveBalance = res;
+      }, error => {
+        this.alertServ.errorToast("Error While Retriving Leave Balanace Details");
+      });
+  }
+
+
 
   public getImageStr() {
     if (this.imgSrc == null || this.imgSrc == "") {
@@ -60,7 +118,7 @@ export class HomePage extends BasePage implements OnInit {
   }
 
   async presentModal(type) {
-    const modal = await this.modalCtrl.create({
+    const modal = await this.modalController.create({
       component: ProfileDetailsPage,
       componentProps: {
         'emp': this.emp,
@@ -70,9 +128,32 @@ export class HomePage extends BasePage implements OnInit {
     });
     return await modal.present();
   }
-  
+  doRefresh(event) {
+    setTimeout(() => {
+      if (this.pageType == "manager") {
+        this.setManagerDetails();
+        this.getLeaveBalanceDetails();
+        this.getWorkerDetails(true);
+      } else {
+        this.getWorkerDetails(true);
+      }
+      event.target.complete();
+    }, 2000);
+  }
+  async logout() {
+    this.alertServ.AlertConfirmation("Logout","Sure you want to logout?").subscribe(res=>{
+      if(res){
+        this.events.publish('authenticated', false);
+        this.paramService.authenticated = false;
+        this.authenticated = false;
+        this.storageServ.clearStorage();
+        this.router.navigateByUrl("/login");
+      }
+    })
+  }
+
   goBack(){
-    if( this.emp.IsManager){
+    if( this.paramService.isManager){
       this.router.navigateByUrl("/tab/tabs/manager-profile");
     }else{
       this.router.navigateByUrl("/myprofile");

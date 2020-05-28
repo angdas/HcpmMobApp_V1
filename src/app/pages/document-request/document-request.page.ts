@@ -1,45 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { StorageService } from 'src/app/providers/storageService/storage.service';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { Component, OnInit, Injector } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
-import { ToastController,LoadingController } from '@ionic/angular';
-import { Events } from 'src/app/providers/events/event.service';
+import { BasePage } from '../base/base.page';
+
 @Component({
   selector: 'app-document-request',
   templateUrl: './document-request.page.html',
   styleUrls: ['./document-request.page.scss'],
 })
-export class DocumentRequestPage implements OnInit {
+export class DocumentRequestPage extends BasePage implements OnInit {
 
-  selectedTab = 'all';
+  public selectedTab = 'all';
+  public pageType: any;
+  public documentList: DocumentRequestModel[] = [];
+  public workerDocumentList: DocumentRequestModel[] = [];
 
-  authenticated: boolean;
-  pageType: any;
-  documentList: DocumentRequestModel[] = [];
-  workerDocumentList: DocumentRequestModel[] = [];
-
-  constructor(public axService: AxService, public router: Router, public dataService: DataService,
-    public paramService: ParameterService, public events: Events, public storageServ: StorageService,
-    private activateRoute: ActivatedRoute, public loadingController: LoadingController,
-    public toastController: ToastController) {
-
-
-    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
-
-    this.events.subscribe("authenticated", res => {
-      if (res) {
-        this.authenticated = true;
-      } else {
-        this.authenticated = false;
-
-        paramService.authenticated = false;
-        storageServ.clearStorage();
-        router.navigateByUrl("/home");
-      }
-    })
+  constructor(injector: Injector,
+    private activateRoute: ActivatedRoute) {
+      super(injector);
+      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
   ngOnInit() {
@@ -48,50 +27,41 @@ export class DocumentRequestPage implements OnInit {
     } else {
       this.getDocumentRequest();
     }
-
   }
+
   ionViewWillEnter() {
-    this.dataService.getDocumentDetailsList$.subscribe(res => {
-      if (res) {
-        this.documentList = res;
-      }
-    })
+    this.documentList = this.dataSPYService.documentList;
+    this.workerDocumentList = this.dataSPYService.myWorkerDocumentList;
   }
+
   async GetMyWorkersDocRequest(){
-    const loading = await this.loadingController.create({
-      message: 'Please wait...',
-      translucent: true,
-      duration: 4000
-    });
-    await loading.present();
-
-    this.axService.GetMyWorkersDocRequest(this.paramService.emp.WorkerId).subscribe(res => {
-      loading.dismiss();
-      this.workerDocumentList = res;
+    await this.showLoadingView({ showOverlay: true }); 
+    this.apiService.GetMyWorkersDocRequest(this.dataSPYService.worker.WorkerId).subscribe(res => {
       console.log(res);
+      this.dataSPYService.myWorkerDocumentList = res;
+      this.storageService.setMyWorkerDocumentList(res);
+      this.workerDocumentList = res;      
+      this.dismissLoadingView(); 
     }, error => {
-      loading.dismiss();
-      this.presentToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
+
   async getDocumentRequest() {
-    const loading = await this.loadingController.create({
-      message: 'Please wait...',
-      translucent: true,
-      duration: 4000
-    });
-    await loading.present();
-
-    this.axService.getDocumentRequest(this.paramService.emp.WorkerId).subscribe(res => {
-      loading.dismiss();
-      this.documentList = res;
-      this.dataService.setDocumentDetailsList(this.documentList);
+    await this.showLoadingView({ showOverlay: true }); 
+    this.apiService.getDocumentRequest(this.dataSPYService.worker.WorkerId).subscribe(res => {
       console.log(res);
+      this.dataSPYService.documentList = res;
+      this.storageService.setDocumentList(res);
+      this.documentList = res;
+      this.dismissLoadingView(); 
     }, error => {
-      loading.dismiss();
-      this.presentToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
+
   addRequest() {
     if(this.pageType == "manager"){
       this.router.navigateByUrl("/tab/tabs/manager-profile/manager_document_request_add/manager");
@@ -106,18 +76,8 @@ export class DocumentRequestPage implements OnInit {
         this.GetMyWorkersDocRequest();
       }else{
         this.getDocumentRequest();        
-      }
-    
+      }    
       event.target.complete();
     }, 2000);
-  }
-
-  async presentToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      position: 'top',
-      duration: 2000
-    });
-    toast.present();
   }
 }

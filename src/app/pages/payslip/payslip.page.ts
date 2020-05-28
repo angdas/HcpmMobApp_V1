@@ -1,40 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { StorageService } from 'src/app/providers/storageService/storage.service';
-import { Platform } from '@ionic/angular';
+import { Component, OnInit, Injector } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { ToastController, LoadingController } from '@ionic/angular';
 import { PayslipModel } from 'src/app/models/worker/workerPayroll.interface';
+import { BasePage } from '../base/base.page';
 
 @Component({
   selector: 'app-payslip',
   templateUrl: './payslip.page.html',
   styleUrls: ['./payslip.page.scss'],
 })
-export class PayslipPage implements OnInit {
+export class PayslipPage extends BasePage implements OnInit {
 
-  pageType: any;
-  selectedMonth: any;
-  payslip: PayslipModel[] = [];
-  isPayroll: boolean = false;
-  totalAmount: any = 0;
-  currency: string;
+  public pageType: any;
+  public selectedMonth: any;
+  public payslip: PayslipModel[] = [];
 
-  constructor(public axService: AxService, public router: Router, public dataService: DataService, public platform: Platform,
-    public paramService: ParameterService, public storageServ: StorageService,
-    private activateRoute: ActivatedRoute, private opener: FileOpener, private file: File, public toastController: ToastController,
-    public loadingController: LoadingController
-  ) {
-
-
-    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+  constructor(injector: Injector,
+    private activateRoute: ActivatedRoute, 
+    private opener: FileOpener, 
+    private file: File) {
+      super(injector);
+      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
-
 
   ngOnInit() {
 
@@ -46,35 +35,28 @@ export class PayslipPage implements OnInit {
     this.getPayslipPdf(sDate);
   }
 
-
   downloadPayslip() {
-
-    this.saveAndOpenPdf(this.payslip[0].Payslip, "statement.pdf")
+    this.saveAndOpenPdf(this.payslip[0].Payslip, "payslip.pdf")
   }
+
   async saveAndOpenPdf(pdf: string, filename: string) {
-    const loading = await this.loadingController.create({
-      message: 'Please wait...',
-      translucent: true,
-      duration: 4000
-    });
-    await loading.present();
-    const writeDirectory = this.platform.is('ios') ? this.file.dataDirectory : this.file.externalDataDirectory;
-    // const writeDirectory = this.file.dataDirectory;
+    await this.showLoadingView({ showOverlay: true });    
+    const writeDirectory = this.isIos() ? this.file.dataDirectory : this.file.externalDataDirectory;
     this.file.writeFile(writeDirectory, filename, this.convertBaseb64ToBlob(pdf, 'application/pdf'), { replace: true })
       .then(() => {
-        loading.dismiss();
+        this.dismissLoadingView(); 
         this.opener.open(writeDirectory + filename, 'application/pdf').then((val) => {
-          console.log(val);
-        })
-          .catch(() => {
+            console.log(val);
+        }).catch(() => {
+            this.dismissLoadingView(); 
             console.log('Error opening pdf file');
-          });
-      })
-      .catch(() => {
-        loading.dismiss();
+        });
+      }).catch(() => {
+        this.dismissLoadingView(); 
         console.error('Error writing pdf file');
       });
   }
+
   convertBaseb64ToBlob(b64Data, contentType): Blob {
     contentType = contentType || '';
     const sliceSize = 512;
@@ -95,31 +77,19 @@ export class PayslipPage implements OnInit {
   }
 
   getPayslipPdf(month) {
-    this.axService.getPayslip(this.paramService.emp.WorkerId, month).subscribe(res => {
+    this.apiService.getPayslip(this.dataSPYService.worker.WorkerId, month).subscribe(res => {
       this.payslip = res;
       console.log(res);
     }, error => {
-      this.errorToast("Error Getting Payslip Details");
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
-  }
-
-  async errorToast(msg) {
-    const toast = await this.toastController.create({
-      message: msg,
-      duration: 2000,
-      position: 'top'
-    });
-    toast.present();
   }
 
   getMonths(from, to) {
     var startDate = moment(from);
     var endDate = moment(to);
-
     var result = [];
-
     var currentDate = startDate.clone();
-
     while (currentDate.isBefore(endDate)) {
       result.push({ month: endDate.format("YYYY-MM-01") });
       endDate.add(-1, 'month');

@@ -20,6 +20,15 @@ const routes: Routes = [
   { path: 'leave-line', loadChildren: () => import('./pages/leave-line/leave-line.module').then(m => m.LeaveLinePageModule) },
   { path: 'login', loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule) },
   { path: 'document-request-header', loadChildren: () => import('./pages/document-request-header/document-request-header.module').then(m => m.DocumentRequestHeaderPageModule) },
+  
+  {
+    path: 'settingsspy',
+    loadChildren: () => import('./pages/settingsspy/settingsspy.module').then( m => m.SettingsspyPageModule)
+  },
+  {
+    path: 'loginspy',
+    loadChildren: () => import('./pages/loginspy/loginspy.module').then( m => m.LoginspyPageModule)
+  },
 
   
 ];

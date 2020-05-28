@@ -1,0 +1,32 @@
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-padding-top">
+      <img [src]="imgSrc" class="ion-align-items-center logo">
+    </ion-row>
+    <ion-row class="ion-justify-content-center">
+      <ion-text class="ion-padding-top font">
+        Welcome to HCPM
+      </ion-text>
+    </ion-row>
+    <p class="ion-text-center">Please login to continue</p>    
+  </ion-grid>
+
+  <div style="margin-top: 40px;">
+    <ion-item>
+      <ion-label position="floating" color="l">Username</ion-label>
+      <ion-input mode="ios" color="l" [(ngModel)]="loginModel.Id"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating" color="l">Password</ion-label>
+      <ion-input type="password" mode="ios" color="l" [(ngModel)]="loginModel.Password" #passwordField></ion-input>
+    </ion-item>
+    <ion-button expand="block" class="ion-marging-top" (click)="login()" [disabled]="loginSpinner">
+      <span *ngIf="!loginSpinner">Login</span>
+      <ion-spinner name="dots" *ngIf="loginSpinner"></ion-spinner>
+    </ion-button>
+  </div>
+  <p class="textColor settings" (click)="gotoSettings()">
+    <ion-icon name="cog-outline"></ion-icon>
+    Settings
+  </p>
+</ion-content>

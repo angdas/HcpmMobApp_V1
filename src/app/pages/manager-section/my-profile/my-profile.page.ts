@@ -1,40 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injector } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MenuController, AlertController } from '@ionic/angular';
-import { AppVersion } from '@ionic-native/app-version/ngx';
-
-import { Platform } from '@ionic/angular';
-import { DataService } from 'src/app/providers/dataService/data.service';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
-import { StorageService } from 'src/app/providers/storageService/storage.service';
 import { Router } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { Events } from 'src/app/providers/events/event.service';
 import { AlertService } from 'src/app/providers/alert.service';
+import { BasePage } from '../../base/base.page';
 @Component({
   selector: 'app-my-profile',
   templateUrl: './my-profile.page.html',
   styleUrls: ['./my-profile.page.scss'],
 })
-export class MyProfilePage implements OnInit {
+export class MyProfilePage extends BasePage implements OnInit {
 
-  imgSrc: any = null;
-  emp: EmployeeModel = {} as EmployeeModel;
-  isManager: boolean;
-  constructor(private sanitizer: DomSanitizer, public dataService: DataService, public platform: Platform,
-    public router: Router, private storageService: StorageService, private parameterservice: ParameterService, public axService: AxService,
-    public events: Events, public alertServ: AlertService,private alertCtrl:AlertController) {
+  public imgSrc: any = null;
+  public emp: EmployeeModel = {} as EmployeeModel;
+  public isManager: boolean;
 
+  constructor(injector: Injector,
+    private sanitizer: DomSanitizer, 
+    public router: Router, 
+    private parameterservice: ParameterService,
+    public alertServ: AlertService) {
+        super(injector);
   }
 
   ngOnInit() {
-    this.getWorkerDetails();
+
   }
+  
   ionViewDidEnter() {
-    this.platform.backButton.subscribe(res => {
-      console.log(res);
-    });
+    this.emp = this.dataSPYService.worker;
+    this.imgSrc = this.dataSPYService.worker.Images;
+    this.isManager = this.dataSPYService.worker.IsManager;
   }
 
   public getImageStr() {
@@ -47,79 +44,82 @@ export class MyProfilePage implements OnInit {
   }
 
   async logout() {
-    this.alertServ.AlertConfirmation("Logout", "Sure you want to logout?").subscribe(res => {
-      if (res) {
-        this.events.publish('authenticated', false);
-        this.parameterservice.authenticated = false;
-        this.storageService.clearStorage();
-        this.router.navigateByUrl("/login");
-      }
-    })
+    window.dispatchEvent(new CustomEvent('user:logout'));
   }
-  getWorkerDetails() {
-    this.axService.getWorkerDetails(this.parameterservice.email).subscribe(async (res) => {
-      console.log(res);
-      this.emp = res;
-      this.dataService.setMyDetails(res);
-      this.storageService.setUserDetails(res);
-      //this.storageService.setDataArea(this.emp.WorkerEmployement[0]);
-      this.events.publish("isManager", this.emp.IsManager);
-      this.parameterservice.isManager = this.emp.IsManager;
-      this.isManager = this.parameterservice.isManager;
-      this.imgSrc = this.emp.Images;
 
-      this.parameterservice.workerEmpList = res.WorkerEmployement;
-      this.storageService.setEmployementList(res.WorkerEmployement);
-      if(res.WorkerEmployement.length == 0) return;
-      if (res.WorkerEmployement.length == 1) {
-        this.storageService.setDataArea(res.WorkerEmployement[0]);
+  async getWorkerDetails() {
+    await this.showLoadingView({ showOverlay: true });    
+    this.apiService.getWorkerDetails(this.dataSPYService.user).subscribe( async (res) => {
+      let worker: EmployeeModel = res;       
+      if(worker) {
+        if(worker.WorkerEmployement == null || worker.WorkerEmployement.length == 0) {
+          window.dispatchEvent(new CustomEvent('worker:logout', {detail: worker})); 
+          this.dismissLoadingView(); 
+          this.translate.get('WORKER_EMPLOYMENT_NOTFOUND').subscribe(str => this.showToast(str)); 
+          this.router.navigateByUrl("/loginspy")      
+        } else {          
+          window.dispatchEvent(new CustomEvent('worker:login', {detail: worker}));  
+          this.dismissLoadingView(); 
+          this.emp = this.dataSPYService.worker;
+          this.imgSrc = this.dataSPYService.worker.Images;
+          this.isManager = this.dataSPYService.worker.IsManager;
+          //--select data area
+          if(this.dataSPYService.worker.WorkerEmployement.length == 1) {
+            window.dispatchEvent(new CustomEvent('worker:setDataArea', {detail: this.dataSPYService.worker.WorkerEmployement[0].DataArea})); 
+          } else if (this.dataSPYService.worker.WorkerEmployement.length > 1) {
+            let inputArr = [];
+            this.dataSPYService.worker.WorkerEmployement.forEach(el => {
+              inputArr.push({
+                name: 'radio',
+                type: 'radio',
+                label: el.DataArea,
+                value: el,
+              })                
+            })
+            const alert = await this.alertCtrl.create({
+              header: 'Select Legal Entity',
+              backdropDismiss: false,
+              inputs: inputArr,
+              buttons: [
+                {
+                  text: 'Ok',
+                  handler: (data) => {
+                    window.dispatchEvent(new CustomEvent('worker:setDataArea', {detail: data})); 
+                    console.log(data);
+                  }
+                }
+              ]
+            });
+            alert.present();
+          }
+          if (this.dataSPYService.worker.IsManager) {
+            this.router.navigateByUrl("/tab/tabs/manager-profile");
+          } else {
+            this.router.navigateByUrl("/myprofile")
+          }
+        }        
       } else {
-        let inputArr = [];
-        res.WorkerEmployement.forEach(el => {
-          inputArr.push(
-            {
-              name: 'radio',
-              type: 'radio',
-              label: el.DataArea,
-              value: el,
-            }
-          )
-        })
-        const alert = await this.alertCtrl.create({
-          header: 'Select Legal Entity',
-          backdropDismiss: false,
-          inputs: inputArr,
-          buttons: [
-            {
-              text: 'Ok',
-              handler: (data) => {
-                this.storageService.setDataArea(data);
-                console.log(data);
-              }
-            }
-          ]
-        });
-
-        alert.present();
+        window.dispatchEvent(new CustomEvent('worker:logout', {detail: worker})); 
+        this.dismissLoadingView(); 
+        this.translate.get('WORKER_NOTFOUND').subscribe(str => this.showToast(str));  
       }
-
     }, (error) => {
-
-
+      this.dismissLoadingView();   
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
-
+/*
   setManagerDetails() {
     this.dataService.getMyDetails$.subscribe(res => {
       this.emp = res;
     })
   }
+*/
 
 
-
-  doRefresh(event) {
-    setTimeout(() => {
-      this.getWorkerDetails();
+  async doRefresh(event) {
+    setTimeout(async () => {
+      await this.getWorkerDetails();    
       event.target.complete();
     }, 2000);
   }

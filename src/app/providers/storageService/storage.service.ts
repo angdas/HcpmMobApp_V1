@@ -3,6 +3,16 @@ import { Storage } from '@ionic/storage';
 import 'rxjs/Rx';
 import { ParameterService } from '../parameterService/parameter.service';
 import { Observable } from 'rxjs';
+import { LoginModel } from 'src/app/models/login.model';
+import { EmployeeModel } from 'src/app/models/worker/worker.interface';
+import { ClientConfigModel } from 'src/app/models/ClientConfig.model';
+import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
+import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
+import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
+import { WorkerPeriod } from 'src/app/models/timesheet/workerPeriod.model';
+import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
+import { DocumentRequestType } from 'src/app/models/Document Request/documentRequestType.model';
+import { DocumentAddressModel } from 'src/app/models/Document Request/documentAddress.model';
 
 @Injectable({
   providedIn: 'root'
@@ -202,5 +212,135 @@ export class StorageService {
       this.setClientConfig(this.parameterservice.clientConfig);
     }
     this.setCompanyLogo(companyLogo);
+  }
+
+
+  //----------new------------
+  async setClientConfiguration(clientConfig: ClientConfigModel) {
+    return this.storage.set('spyClientConfig', clientConfig);
+  }
+
+  async getClientConfiguration(): Promise<ClientConfigModel> {
+    return this.storage.get('spyClientConfig');
+  }
+
+  async setIsAuthenticated(isAuthenticated: boolean) {
+    return this.storage.set('spyIsAuthenticated', isAuthenticated);
+  }
+
+  async getIsAuthenticated(): Promise<boolean> {
+    return this.storage.get('spyIsAuthenticated');
+  }
+
+  async setUser(user: LoginModel) {
+    return this.storage.set('spyUser', user);
+  }
+
+  async getUser(): Promise<LoginModel> {
+    return this.storage.get('spyUser');
+  }
+
+  getLang(): Promise<string> {
+    return this.storage.get('spyLang');
+  }
+
+  setLang(val: string) {
+    return this.storage.set('spyLang', val);
+  }
+
+  async setWorker(worker: EmployeeModel) {
+    return this.storage.set('spyWorker', worker);
+  }
+
+  async getWorker(): Promise<EmployeeModel> {
+    return this.storage.get('spyWorker');
+  }
+
+  getWorkerDataArea(): Promise<string> {
+    return this.storage.get('spyDataArea');
+  }
+
+  setWorkerDataArea(val: string) {
+    return this.storage.set('spyDataArea', val);
+  }
+
+  getLeaveBalance(): Promise<LeaveBalanceContract[]> {
+    return this.storage.get('spyLeaveBalance');
+  }
+
+  setLeaveBalance(val: LeaveBalanceContract[]) {
+    return this.storage.set('spyLeaveBalance', val);
+  }
+
+  getLeaveAppList(): Promise<LeaveAppTableContract[]> {
+    return this.storage.get('spyLeaveAppList');
+  }
+
+  setLeaveAppList(val: LeaveAppTableContract[]) {
+    return this.storage.set('spyLeaveAppList', val);
+  }
+
+  getMyWorkerLeaveAppList(): Promise<LeaveAppTableContract[]> {
+    return this.storage.get('spyMyWorkerLeaveAppList');
+  }
+
+  setMyWorkerLeaveAppList(val: LeaveAppTableContract[]) {
+    return this.storage.set('spyMyWorkerLeaveAppList', val);
+  }
+
+  getTimesheetList(): Promise<TimesheetTableContact[]> {
+    return this.storage.get('spyTimesheetList');
+  }
+
+  setTimesheetList(val: TimesheetTableContact[]) {
+    return this.storage.set('spyTimesheetList', val);
+  }
+
+  getPeriodList(): Promise<WorkerPeriod[]> {
+    return this.storage.get('spyPeriodList');
+  }
+
+  setPeriodList(val: WorkerPeriod[]) {
+    return this.storage.set('spyPeriodList', val);
+  }
+
+  getMyWorkerTimesheetList(): Promise<TimesheetTableContact[]> {
+    return this.storage.get('spymyWorkerTimesheetList');
+  }
+
+  setMyWorkerTimesheetList(val: TimesheetTableContact[]) {
+    return this.storage.set('spymyWorkerTimesheetList', val);
+  }
+
+  getDocumentList(): Promise<DocumentRequestModel[]> {
+    return this.storage.get('spyDocumnetList');
+  }
+
+  setDocumentList(val: DocumentRequestModel[]) {
+    return this.storage.set('spyDocumnetList', val);
+  }
+
+  getMyWorkerDocumentList(): Promise<DocumentRequestModel[]> {
+    return this.storage.get('spymyWorkerDocumentList');
+  }
+
+  setMyWorkerDocumentList(val: DocumentRequestModel[]) {
+    return this.storage.set('spymyWorkerDocumentList', val);
+  }
+
+  getDocRequestTypeList(): Promise<DocumentRequestType[]> {
+    return this.storage.get('spyDocumentRequestTypeList');
+  }
+
+  setDocRequestTypeList(val: DocumentRequestType[]) {
+    return this.storage.set('spyDocumentRequestTypeList', val);
+  }
+
+  getDocReqAddressTypeList(): Promise<DocumentAddressModel[]> {
+    return this.storage.get('spyDocReqAddressTypeList');
+  }
+
+  setDocReqAddressTypeList(val: DocumentAddressModel[]) {
+    return this.storage.set('spyDocReqAddressTypeList', val);
   }
 }

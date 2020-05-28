@@ -30,10 +30,16 @@ export class SettingsPage implements OnInit {
   toggle: any;
   prefersDark: any;
   authenticated: boolean;
-  constructor(public paramServ: ParameterService, public router: Router, private storageService: StorageService, 
+  constructor(
+    public paramServ: ParameterService, 
+    public router: Router, 
+    private storageService: StorageService, 
     public axService: AxService,
-    public events: Events, private appVersion: AppVersion,
-    public loadingController: LoadingController, private menuCtrl: MenuController,public alertServ:AlertService,
+    public events: Events, 
+    private appVersion: AppVersion,
+    public loadingController: LoadingController, 
+    private menuCtrl: MenuController,
+    public alertServ:AlertService,
     public platform: Platform) {
     this.menuCtrl.enable(false);
     //console.log(this.platform.platforms());

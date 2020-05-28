@@ -1,5 +1,4 @@
 <ion-content>
-
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="arrow-down-outline" pullingText="Pull to refresh" refreshingSpinner="circles"
       refreshingText="Refreshing...">
@@ -7,27 +6,18 @@
   </ion-refresher>
   <div class="back">
     <ion-toolbar>
-
-
     </ion-toolbar>
-
     <ion-row class="ion-justify-content-center">
-
       <ion-thumbnail (click)="navigateToPage('/tab/tabs/manager-profile/manager_Profile_details/manager','home')">
         <img [src]="getImageStr()">
       </ion-thumbnail>
     </ion-row>
-
     <ion-row class="ion-justify-content-center">
       <ion-text color="white" class="text">{{emp.Name}}</ion-text>
     </ion-row>
-
   </div>
-
-
   <ion-grid>
     <ion-row>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
           (click)="navigateToPage('/tab/tabs/manager-profile/manager_Profile_details/manager','home')">
@@ -35,16 +25,13 @@
         </ion-button>
         <p class="ion-text-center">Profile</p>
       </ion-col>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
           (click)="navigateToPage('/tab/tabs/manager-profile/manager_timesheet_home/manager','timesheet-home')">
           <ion-icon name="timer-outline" color="light"></ion-icon>
         </ion-button>
-
         <p class="ion-text-center">Timesheet</p>
       </ion-col>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
           (click)="navigateToPage('/tab/tabs/manager-profile/manager_leave_home/manager','leave-home')">
@@ -52,11 +39,8 @@
         </ion-button>
         <p class="ion-text-center">Leave</p>
       </ion-col>
-
     </ion-row>
-
     <ion-row>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
           (click)="navigateToPage('/tab/tabs/manager-profile/manager_payslip/manager','payslip')">
@@ -64,7 +48,6 @@
         </ion-button>
         <p class="ion-text-center">Payslip</p>
       </ion-col>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
           (click)="navigateToPage('/tab/tabs/manager-profile/manager_document_request/manager','document-request')">
@@ -72,20 +55,14 @@
         </ion-button>
         <p class="ion-text-center">HR Request</p>
       </ion-col>
-
       <ion-col size="4">
         <ion-button class="btn" expand="block"
-        (click)="navigateToPage('/tab/tabs/manager-profile/manager_settings','settings')">
+        (click)="navigateToPage('/tab/tabs/manager-profile/manager_settings','settingsspy')">
           <ion-icon name="notifications" color="light"></ion-icon>
         </ion-button>
         <p class="ion-text-center">Settings</p>
       </ion-col>
-
     </ion-row>
   </ion-grid>
-
   <ion-icon name="power-outline" (click)="logout()" class="logoutBtn"></ion-icon>
-
-
-
 </ion-content>

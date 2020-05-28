@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title color="dark">Settings</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="margin:10px" *ngIf="!this.dataSPYService.isAuthenticated;else validUser">
+    <ion-item>
+      <ion-label position="floating">Client Id</ion-label>
+      <ion-input type="text" [(ngModel)]="clientConfig.clientId" placeholder="Enter Client ID" #clientId></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Instance</ion-label>
+      <ion-select value="LIVE" [(ngModel)]="clientConfig.instance" interface="action-sheet">
+        <ion-select-option value="LIVE">LIVE</ion-select-option>
+        <ion-select-option value="UAT">UAT</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-button (click)="getClientUrl()" expand="block" style="margin-top: 16px;">
+      Submit
+    </ion-button>
+  </div>
+  <ng-template #validUser>
+    <ion-item>      
+      <ion-label>Legal Entity</ion-label>
+      <ion-select [value]="this.dataSPYService.workerDataArea" [(ngModel)]="this.dataSPYService.workerDataArea" interface="action-sheet" (ionChange)="legalEntityChanged()">
+        <ion-select-option *ngFor="let employementList of this.dataSPYService.worker.WorkerEmployement" [value]="employementList"> {{employementList.DataArea}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ng-template>
+  <p class="appVersion">Version : {{versionNumber}}</p>
+</ion-content>

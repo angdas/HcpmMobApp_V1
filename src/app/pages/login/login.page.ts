@@ -10,6 +10,7 @@ import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { Events } from 'src/app/providers/events/event.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AlertService } from 'src/app/providers/alert.service';
+import { BasePage } from '../base/base.page';
 
 @Component({
   selector: 'app-login',

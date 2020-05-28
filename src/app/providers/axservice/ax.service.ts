@@ -14,10 +14,9 @@ export class AxService {
 
   public baseAddress = "";
 
-
   constructor(public http: HttpClient,
     private storageservice: StorageService, private parameterservice: ParameterService) {
-
+      
     if (!this.parameterservice.baseUrl) {
       storageservice.getAllValuesFromStorage.subscribe(res => { }, error => { },
         () => {

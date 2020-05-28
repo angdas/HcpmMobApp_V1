@@ -1,5 +1,6 @@
 export class ClientConfigModel {
-    clientId: any;
-    instance: any;
-    api:any;
+    clientId: string;
+    instance: string;
+    api: string;
+    companyLogo: string;
 } 

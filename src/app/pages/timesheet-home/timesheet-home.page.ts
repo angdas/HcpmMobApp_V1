@@ -1,24 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Injector } from '@angular/core';
 import * as moment from 'moment';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-import { AxService } from 'src/app/providers/axservice/ax.service';
 import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
-import { StorageService } from 'src/app/providers/storageService/storage.service';
-
-import { DataService } from 'src/app/providers/dataService/data.service';
 import { IonSlides } from '@ionic/angular';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 import { WorkerPeriod } from 'src/app/models/timesheet/workerPeriod.model';
 import { Events } from 'src/app/providers/events/event.service';
+import { BasePage } from '../base/base.page';
 
 @Component({
   selector: 'app-timesheet-home',
   templateUrl: './timesheet-home.page.html',
   styleUrls: ['./timesheet-home.page.scss'],
 })
-export class TimesheetHomePage implements OnInit {
+export class TimesheetHomePage extends BasePage implements OnInit {
+
   @ViewChild('slides', { static: true }) slides: IonSlides;
   periodList: WorkerPeriod[] = [];
   selectedTab = 'all';
@@ -28,37 +26,29 @@ export class TimesheetHomePage implements OnInit {
   timesheetPeriodList: TimesheetPeriodDate[] = [];
   authenticated: boolean;
 
-  myworkerTimesheetList: TimesheetTableContact[];
+  public myworkerTimesheetList: TimesheetTableContact[];
   pageType: any;
   selectedPeriod: WorkerPeriod;
 
-  constructor(public router: Router, public paramService: ParameterService, public events: Events,
-    public storageServ: StorageService, public axService: AxService, public dataService: DataService,
+  constructor(injector: Injector,
+    public router: Router, 
+    public paramService: ParameterService, 
+    public events: Events,
     private activateRoute: ActivatedRoute) {
-
-    this.events.subscribe('timesheetAdded', (res) => {
-      if (res) {
-        this.dataService.getTimesheetList$.subscribe(res => {
-          this.timesheetList = res;
-        });
-      }
+      super(injector);
+      this.events.subscribe('timesheetAdded', (res) => {
+        if (res) {
+          /*
+          this.dataSPYService.getTimesheetList$.subscribe(res => {
+            this.timesheetList = res;
+          });*/
+        }
 
     })
 
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
-
-
-    this.events.subscribe("authenticated", res => {
-      if (res) {
-        this.authenticated = true;
-      } else {
-        this.authenticated = false;
-        paramService.authenticated = false;
-        storageServ.clearStorage();
-        router.navigateByUrl("/home");
-      }
-    })
   }
+
   ngOnInit() {
     if (this.pageType == "worker") {
       this.getMyWorkersTimesheetApprovals();
@@ -67,13 +57,25 @@ export class TimesheetHomePage implements OnInit {
     }
   }
 
-  getMyWorkersTimesheetApprovals() {
-    this.axService.GetMyWorkersTimesheetApprovals(this.paramService.emp.WorkerId).subscribe(res => {
-      console.log(res);
-      this.myworkerTimesheetList = res;
-    })
+  ionViewWillEnter() {
+    this.myworkerTimesheetList = this.dataSPYService.myworkerTimesheetList;
+    this.periodList = this.dataSPYService.periodList;
+    this.timesheetList = this.dataSPYService.timesheetList;
   }
 
+  async getMyWorkersTimesheetApprovals() {
+    await this.showLoadingView({ showOverlay: true });   
+    this.apiService.GetMyWorkersTimesheetApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {
+      console.log(res);
+      this.dataSPYService.myworkerTimesheetList = res;
+      this.storageService.setMyWorkerTimesheetList(res);
+      this.myworkerTimesheetList = res;
+      this.dismissLoadingView(); 
+    }, error => {
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
+    })
+  }
 
   getTimesheetPeriodDateList(startDate, endDate) {
     var sDate = new Date(moment(startDate).format("YYYY-MM-DD"));
@@ -85,28 +87,41 @@ export class TimesheetHomePage implements OnInit {
       var periodObj: TimesheetPeriodDate = {} as TimesheetPeriodDate;
       periodObj.PeriodDate = new Date(m.format('YYYY-MM-DD'));
       periodObj.WorkingHours = 8;
-
       if (i < 8) {
         period.push(periodObj);
       }
     }
     return period;
   }
-  getWorkerCurrentTimesheet(periodDate) {
-    this.axService.getWorkerTimesheet(this.paramService.emp.WorkerId, periodDate).subscribe(res => {
+
+  async getWorkerCurrentTimesheet(periodDate) {
+    await this.showLoadingView({ showOverlay: true });   
+    this.apiService.getWorkerTimesheet(this.dataSPYService.worker.WorkerId, periodDate).subscribe(res => {      
       console.log(res);
+      this.dataSPYService.timesheetList = res;
+      this.storageService.setTimesheetList(res);
       this.timesheetList = res;
+      this.dismissLoadingView();
       this.showDetails = true;
-      this.timesheetPeriodList = this.getTimesheetPeriodDateList(this.selectedPeriod.PeriodFrom, this.selectedPeriod.PeriodTo)
-      this.dataService.settimesheetPeriodList(this.timesheetPeriodList);
+      this.timesheetPeriodList = this.getTimesheetPeriodDateList(this.selectedPeriod.PeriodFrom, this.selectedPeriod.PeriodTo);      
     }, (error) => {
-      console.log(error);
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     });
   }
-  getWorkerTimesheetPeriod(periodDate) {
-    this.axService.getWorkerPeriod(this.paramService.emp.WorkerId, periodDate).subscribe(res => {
-      this.periodList = res;
+
+  async getWorkerTimesheetPeriod(periodDate) {
+    await this.showLoadingView({ showOverlay: true });  
+    this.apiService.getWorkerPeriod(this.dataSPYService.worker.WorkerId, periodDate).subscribe(res => {
+      console.log(res);
+      this.dataSPYService.periodList = res;
+      this.storageService.setPeriodList(res);
+      this.periodList = res;      
       this.getCurrentPeriod();
+      this.dismissLoadingView();
+    }, (error) => {
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
 
@@ -120,10 +135,12 @@ export class TimesheetHomePage implements OnInit {
       }
     }
   }
+
   addTimesheet() {
-    this.dataService.setTimesheetList(this.timesheetList)
+    this.dataSPYService.timesheetList = this.timesheetList;
     this.router.navigateByUrl("timesheet-add/add");
   }
+
   doRefresh(event) {
     setTimeout(() => {
       if (this.pageType != "worker") {

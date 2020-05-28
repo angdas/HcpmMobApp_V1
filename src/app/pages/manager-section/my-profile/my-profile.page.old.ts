@@ -1,53 +1,40 @@
-import { Component, OnInit, Injector } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MenuController, AlertController } from '@ionic/angular';
+import { AppVersion } from '@ionic-native/app-version/ngx';
+
+import { Platform } from '@ionic/angular';
+import { DataService } from 'src/app/providers/dataService/data.service';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
+import { StorageService } from 'src/app/providers/storageService/storage.service';
+import { Router } from '@angular/router';
+import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { AxService } from 'src/app/providers/axservice/ax.service';
 import { Events } from 'src/app/providers/events/event.service';
-import { ProfileDetailsPage } from './profile-details/profile-details.page';
 import { AlertService } from 'src/app/providers/alert.service';
-import { BasePage } from '../base/base.page';
-
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-my-profile',
+  templateUrl: './my-profile.page.html',
+  styleUrls: ['./my-profile.page.scss'],
 })
-export class HomePage extends BasePage implements OnInit {
-  
-  public emp: EmployeeModel = {} as EmployeeModel;
-  public leaveBalance: LeaveBalanceContract[];
-  public imgSrc: string;
-  public pageType: any;
+export class MyProfilePage implements OnInit {
 
-  constructor(injector: Injector,
-    public events: Events,     
-    public alertServ: AlertService, 
-    private sanitizer: DomSanitizer, 
-    private activateRoute: ActivatedRoute,
-    public router: Router) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+  imgSrc: any = null;
+  emp: EmployeeModel = {} as EmployeeModel;
+  isManager: boolean;
+  constructor(private sanitizer: DomSanitizer, public dataService: DataService, public platform: Platform,
+    public router: Router, private storageService: StorageService, private parameterservice: ParameterService, public axService: AxService,
+    public events: Events, public alertServ: AlertService,private alertCtrl:AlertController) {
+
   }
 
   ngOnInit() {
-    
+    this.getWorkerDetails();
   }
-
-  ionViewWillEnter() {
-    this.emp = this.dataSPYService.worker;
-    this.imgSrc = this.dataSPYService.worker.Images;
-    this.leaveBalance = this.dataSPYService.leaveBalance;
-    this.getLeaveBalance();
-  }
-  
-  getLeaveBalance() {
-    this.apiService.getLeaveType(this.dataSPYService.worker.WorkerId).subscribe(res => {
+  ionViewDidEnter() {
+    this.platform.backButton.subscribe(res => {
       console.log(res);
-      this.dataSPYService.leaveBalance = res;
-      this.storageService.setLeaveBalance(res);
-      this.leaveBalance = res;
-    });    
+    });
   }
 
   public getImageStr() {
@@ -59,24 +46,90 @@ export class HomePage extends BasePage implements OnInit {
     }
   }
 
-  async presentModal(type) {
-    const modal = await this.modalCtrl.create({
-      component: ProfileDetailsPage,
-      componentProps: {
-        'emp': this.emp,
-        'type': type,
-        'leaveDetails': this.leaveBalance
+  async logout() {
+    this.alertServ.AlertConfirmation("Logout", "Sure you want to logout?").subscribe(res => {
+      if (res) {
+        this.events.publish('authenticated', false);
+        this.parameterservice.authenticated = false;
+        this.storageService.clearStorage();
+        this.router.navigateByUrl("/login");
       }
-    });
-    return await modal.present();
+    })
   }
-  
-  goBack(){
-    if( this.emp.IsManager){
-      this.router.navigateByUrl("/tab/tabs/manager-profile");
-    }else{
-      this.router.navigateByUrl("/myprofile");
+  getWorkerDetails() {
+    this.axService.getWorkerDetails(this.parameterservice.email).subscribe(async (res) => {
+      console.log(res);
+      this.emp = res;
+      this.dataService.setMyDetails(res);
+      this.storageService.setUserDetails(res);
+      //this.storageService.setDataArea(this.emp.WorkerEmployement[0]);
+      this.events.publish("isManager", this.emp.IsManager);
+      this.parameterservice.isManager = this.emp.IsManager;
+      this.isManager = this.parameterservice.isManager;
+      this.imgSrc = this.emp.Images;
+
+      this.parameterservice.workerEmpList = res.WorkerEmployement;
+      this.storageService.setEmployementList(res.WorkerEmployement);
+      if(res.WorkerEmployement.length == 0) return;
+      if (res.WorkerEmployement.length == 1) {
+        this.storageService.setDataArea(res.WorkerEmployement[0]);
+      } else {
+        let inputArr = [];
+        res.WorkerEmployement.forEach(el => {
+          inputArr.push(
+            {
+              name: 'radio',
+              type: 'radio',
+              label: el.DataArea,
+              value: el,
+            }
+          )
+        })
+        const alert = await this.alertCtrl.create({
+          header: 'Select Legal Entity',
+          backdropDismiss: false,
+          inputs: inputArr,
+          buttons: [
+            {
+              text: 'Ok',
+              handler: (data) => {
+                this.storageService.setDataArea(data);
+                console.log(data);
+              }
+            }
+          ]
+        });
+
+        alert.present();
+      }
+
+    }, (error) => {
+
+
+    })
+  }
+
+  setManagerDetails() {
+    this.dataService.getMyDetails$.subscribe(res => {
+      this.emp = res;
+    })
+  }
+
+
+
+  doRefresh(event) {
+    setTimeout(() => {
+      this.getWorkerDetails();
+      event.target.complete();
+    }, 2000);
+  }
+
+  navigateToPage(whenManager, whenEmp) {
+    if (this.isManager) {
+      this.router.navigateByUrl(whenManager);
+    } else {
+      this.router.navigateByUrl(whenEmp);
     }
+
   }
 }
-

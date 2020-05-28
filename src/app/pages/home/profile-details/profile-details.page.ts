@@ -1,31 +1,37 @@
-import { Component, OnInit, Input } from '@angular/core';
-
-import { ModalController, NavParams } from '@ionic/angular';
-
+import { Component, OnInit, Injector } from '@angular/core';
+import { NavParams } from '@ionic/angular';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
+import { BasePage } from '../../base/base.page';
+
 @Component({
   selector: 'profile-detail',
   templateUrl: './profile-details.page.html',
   styleUrls: ['./profile-details.page.scss'],
 })
-export class ProfileDetailsPage implements OnInit {
+export class ProfileDetailsPage extends BasePage implements OnInit {
 
-  emp: EmployeeModel = {} as EmployeeModel;
-  leaveBalance: LeaveBalanceContract;
-  pageType: any = "";
+  public emp: EmployeeModel = {} as EmployeeModel;
+  public leaveBalance: LeaveBalanceContract[];
+  public pageType: any = "";
 
-  constructor(public modalController: ModalController, private navParams: NavParams) { }
+  constructor(injector: Injector,
+    private navParams: NavParams) { 
+      super(injector);
+    }
 
   ngOnInit() {
+    
+  }
+
+  ionViewWillEnter() {
     this.emp = this.navParams.data.emp;
     this.pageType = this.navParams.data.type;
     this.leaveBalance = this.navParams.data.leaveDetails;
   }
 
-
   async closeModal() {
-    await this.modalController.dismiss();
+    await this.modalCtrl.dismiss();
   }
 
   checkDate(date){

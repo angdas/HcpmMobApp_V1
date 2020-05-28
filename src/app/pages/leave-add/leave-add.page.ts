@@ -1,20 +1,10 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-
-import { LoadingController, ModalController } from '@ionic/angular';
-
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-
+import { Component, OnInit, HostListener, Injector } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { LeaveAppLineContract } from 'src/app/models/leave/leaveAppLineContract.interface';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 import { LeaveBalanceContract } from 'src/app/models/leave/leaveBalanceContract.interface';
-
-import { CalendarModal, CalendarModalOptions, CalendarResult } from 'ion2-calendar';
-
-import { startWith, map } from 'rxjs/operators';
+import { CalendarModal, CalendarModalOptions } from 'ion2-calendar';
+import { BasePage } from '../base/base.page';
 import { AlertService } from 'src/app/providers/alert.service';
 
 @Component({
@@ -22,34 +12,25 @@ import { AlertService } from 'src/app/providers/alert.service';
   templateUrl: './leave-add.page.html',
   styleUrls: ['./leave-add.page.scss'],
 })
-export class LeaveAddPage implements OnInit {
+export class LeaveAddPage extends BasePage implements OnInit {
 
   selectedLeaveType: LeaveBalanceContract = {} as LeaveBalanceContract;
-  leaveTypeList: LeaveBalanceContract[] = [];
-
+  public leaveTypeList: LeaveBalanceContract[] = [];
   leaveLine: LeaveAppLineContract = {} as LeaveAppLineContract;
   newLeave: LeaveAppTableContract = {} as LeaveAppTableContract;
   leaveList: LeaveAppTableContract[] = [];
-
   sub: any;
   sub1: any;
   pageType: any;
   leaveLineAdd: boolean;
-
-
   dataChangeNotSaved: boolean = false;
 
-
-  constructor(public dataService: DataService, public router: Router,
-    public alertServ: AlertService, public axService: AxService, public paramService: ParameterService,
-    public loadingController: LoadingController, private activateRoute: ActivatedRoute, public modalController: ModalController) {
-
-    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+  constructor(injector: Injector,
+    private activateRoute: ActivatedRoute,
+    private alertService: AlertService) {
+      super(injector);
+      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
-
-
-
-
 
   async openCalendar() {
     const options: CalendarModalOptions = {
@@ -57,17 +38,12 @@ export class LeaveAddPage implements OnInit {
       title: 'Select Date',
       color: 'primary'
     };
-
-    let myCalendar = await this.modalController.create({
+    let myCalendar = await this.modalCtrl.create({
       component: CalendarModal,
       componentProps: { options }
     });
-
     myCalendar.present();
-
     myCalendar.onDidDismiss().then((dataReturned) => {
-
-
       this.leaveLine.StartDate = new Date(dataReturned.data.from.dateObj);
       this.leaveLine.EndDate = new Date(dataReturned.data.to.dateObj);
       console.log(dataReturned)
@@ -76,6 +52,7 @@ export class LeaveAddPage implements OnInit {
 
 
   ngOnInit() {
+    /*
     this.sub = this.dataService.getleaveList$.subscribe(res => {
       this.leaveList = res;
     })
@@ -85,7 +62,8 @@ export class LeaveAddPage implements OnInit {
         this.newLeave = res;
         this.leaveLineAdd = true;
       }
-    })
+    })*/
+    this.leaveList = this.dataSPYService.leaveAppList;
     this.getLeaveType(new Date());
 
   }
@@ -100,7 +78,7 @@ export class LeaveAddPage implements OnInit {
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes is not Updated. Do you want to leave this page?').subscribe(res => {
         ret = res;
       })
     }
@@ -108,6 +86,7 @@ export class LeaveAddPage implements OnInit {
 
     return ret;
   }
+
   submitLeave() {
     if (this.validator()) {
       if (this.leaveLineAdd) {
@@ -115,12 +94,11 @@ export class LeaveAddPage implements OnInit {
         this.leaveLine.ActualEndDate = this.leaveLine.EndDate;
         this.leaveLine.Balance = this.selectedLeaveType.AbsenceDays;
         this.leaveLine.Hours = 0;
-
-        this.leaveLine.DataArea = this.paramService.dataAreaObj.DataArea;
+        this.leaveLine.DataArea = this.dataSPYService.workerDataArea;
         var sameLeave = false;
         for (var i = 0; i < this.newLeave.LeaveApplicationLine.length; i++) {
           if (this.newLeave.LeaveApplicationLine[i].AbsenceCode == this.leaveLine.AbsenceCode) {
-            this.alertServ.errorToast("Leave already applied for this leave type");
+            this.translate.get('LEAVE_EXIST').subscribe(str => this.showToast(str));
             sameLeave = true;
             break;
           }
@@ -137,22 +115,20 @@ export class LeaveAddPage implements OnInit {
         this.newLeave.Remarks = "";
         this.newLeave.WorkflowRemarks = "";
         this.newLeave.LeaveApplicationLine = [];
-        this.newLeave.DataArea = this.paramService.dataAreaObj.DataArea;
-
+        this.newLeave.DataArea = this.dataSPYService.workerDataArea;
+        this.newLeave.WorkerId = this.dataSPYService.worker.WorkerId;
 
         this.leaveLine.ActualStartDate = this.leaveLine.StartDate;
         this.leaveLine.ActualEndDate = this.leaveLine.EndDate;
-        this.leaveLine.DataArea = this.paramService.dataAreaObj.DataArea;
+        this.leaveLine.DataArea = this.dataSPYService.workerDataArea;
         this.leaveLine.Balance = this.selectedLeaveType.AbsenceDays;
         this.leaveLine.Hours = 0;
 
-        this.newLeave.LeaveApplicationLine.push(this.leaveLine);
-        this.newLeave.WorkerId = this.paramService.emp.WorkerId;
+        this.newLeave.LeaveApplicationLine.push(this.leaveLine);        
 
         this.updateLeaveDetails();
       }
     }
-
   }
 
   ngOnDestroy() {
@@ -163,41 +139,31 @@ export class LeaveAddPage implements OnInit {
       this.newLeave = {} as LeaveAppTableContract;
     }
   }
+
   startDateSelected() {
     this.selectedLeaveType = {} as LeaveBalanceContract;
     this.getLeaveType(this.leaveLine.StartDate)
   }
+
   async updateLeaveDetails() {
-
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
-
-    this.axService.updateEmplLeaveAppl(this.newLeave).subscribe(res => {
-      loading.dismiss();
+    await this.showLoadingView({ showOverlay: true }); 
+    this.apiService.updateEmplLeaveAppl(this.newLeave).subscribe(res => {      
       console.log(res);
       if (res.toUpperCase() == "TRUE") {
         if (!this.leaveLineAdd) {
           this.newLeave.IsEditable = true;
           this.leaveList.push(this.newLeave);
         }
-        /*
-
-        ********************************DON'T DELETE THIS
-
-        */
-
-        this.axService.getLeaveDetails(this.paramService.emp.WorkerId).subscribe(res => {
-          this.dataService.setLeaveList(res);
+        this.apiService.getLeaveDetails(this.dataSPYService.worker.WorkerId).subscribe(res => {
           console.log(res);
+          this.dataSPYService.leaveAppList = res;
+          this.storageService.setLeaveAppList(res);
+          this.dismissLoadingView();          
         }, error => {
+          this.dismissLoadingView(); 
+          this.translate.get(error).subscribe(str => this.showToast(str));
         })
-
-        //this.dataService.setLeaveList(this.leaveList);
-        this.alertServ.AlertMessage("Success", "Leave Created Successfully")
+        this.translate.get('LEAVE_CREATED').subscribe(str => this.showAlert(str));
         this.newLeave = {} as LeaveAppTableContract;
         if (this.pageType == "manager") {
           this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
@@ -205,25 +171,30 @@ export class LeaveAddPage implements OnInit {
           this.router.navigateByUrl("leave-home");
         }
       } else {
-        this.alertServ.errorToast(res)
+        this.showToast(res);
       }
     }, error => {
-      loading.dismiss();
-      this.alertServ.errorToast("Error Connecting to server, Please Try Again")
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
+
   compareDate() {
     if (!this.leaveLine.StartDate || !this.leaveLine.EndDate) return false;
-
     return new Date(this.leaveLine.StartDate).getDate() == new Date(this.leaveLine.EndDate).getDate();
   }
 
-  getLeaveType(date) {
-    this.axService.getLeaveType(this.paramService.emp.WorkerId, new Date(date)).subscribe(res => {
+  async getLeaveType(date) {
+    await this.showLoadingView({ showOverlay: true });   
+    this.apiService.getLeaveType(this.dataSPYService.worker.WorkerId, new Date(date)).subscribe(res => {
       console.log(res);
+      this.dataSPYService.leaveBalance = res;
+      this.storageService.setLeaveBalance(res);
       this.leaveTypeList = res;
+      this.dismissLoadingView(); 
     }, error => {
-      console.log(error);
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
 
@@ -233,14 +204,14 @@ export class LeaveAddPage implements OnInit {
   }
 
   validator() {
-    if (!this.leaveLine.AbsenceCode) {
-      this.alertServ.errorToast("Leave Type Cann't be blank");
-    } else if (!this.leaveLine.StartDate) {
-      this.alertServ.errorToast("Start Date Cann't be blank");
+    if (!this.leaveLine.StartDate) {
+      this.translate.get('LEAVE_SD_BLANK').subscribe(str => this.showToast(str));
     } else if (!this.leaveLine.EndDate) {
-      this.alertServ.errorToast("End Date Cann't be blank");
+      this.translate.get('LEAVE_ED_BLANK').subscribe(str => this.showToast(str));
+    } else if (!this.leaveLine.AbsenceCode) {
+      this.translate.get('LEAVE_TYPE_BLANK').subscribe(str => this.showToast(str));
     } else if ((this.leaveLine.StartDate == this.leaveLine.EndDate) && (!this.leaveLine.Hours)) {
-      this.alertServ.errorToast("Hours Cann't be blank");
+      this.translate.get('LEAVE_HRS_BLANK').subscribe(str => this.showToast(str));
     } else {
       return true;
     }
