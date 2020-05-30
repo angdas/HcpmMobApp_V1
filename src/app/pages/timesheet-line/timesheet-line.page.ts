@@ -1,61 +1,44 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
-
-import { Router } from '@angular/router';
-
-import { ModalController } from '@ionic/angular';
-import { LoadingController } from '@ionic/angular';
-import { Observable } from 'rxjs';
+import { Component, OnInit, HostListener, Injector } from '@angular/core';
 import { TimesheetProject } from 'src/app/models/timesheet/tsProject.interface';
-
-import { AxService } from 'src/app/providers/axservice/ax.service';
 import { PopoverController } from '@ionic/angular';
 import { TimesheetCategory } from 'src/app/models/timesheet/tsCategory.interface';
 import { CommentPageForLine } from './comment/comment.page';
-
 import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
 import { TimesheetLine } from 'src/app/models/timesheet/tsLineListContact.interface';
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 import { Events } from 'src/app/providers/events/event.service';
 import { SearchPage } from 'src/app/common/search/search.page';
 import { AlertService } from 'src/app/providers/alert.service';
+import { BasePage } from '../base/base.page';
+
 @Component({
   selector: 'app-timesheet-line',
   templateUrl: './timesheet-line.page.html',
   styleUrls: ['./timesheet-line.page.scss'],
 })
-export class TimesheetLinePage implements OnInit {
+export class TimesheetLinePage extends BasePage implements OnInit {
 
   tsLine = new TimesheetLine();
   timesheetPeriodList: TimesheetPeriodDate[] = [];
   timesheetApp: TimesheetTableContact = {} as TimesheetTableContact;
-
   tsProject: TimesheetProject[] = [];
   tsCategory: TimesheetCategory[] = [];
   tsActivity: TimesheetProject[] = [];
-
   selectedProj: TimesheetProject = {} as TimesheetProject;
-
   projectActivityList: TimesheetProject[] = [];
-
   sub0: any;
   sub: any;
   sub1: any;
-
   timesheetUpdated: boolean = false;
   isEditable: boolean;
   dataChangeNotSaved:boolean = false;
-
   
-  constructor(public dataService: DataService, public paramService: ParameterService, public router: Router,
-    public axService: AxService,private alertServ:AlertService,
-    public popoverController: PopoverController, public events: Events,
-    public modalController:ModalController,
-    public loadingController: LoadingController) {
-
+  constructor(injector: Injector,    
+    public popoverController: PopoverController, 
+    private alertService: AlertService,
+    public events: Events) {
+      super(injector);
   }
-
 
   ngOnInit() {
     this.getProjectList();
@@ -63,7 +46,6 @@ export class TimesheetLinePage implements OnInit {
       this.getTSLineData();
     }, 300);
   }
-
 
   @HostListener('change', ['$event'])
   @HostListener('input', ['$event'])
@@ -75,21 +57,35 @@ export class TimesheetLinePage implements OnInit {
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
         ret = res;
       })
     }
     else ret = true;
-
     return ret;
   }
 
   getTSLineData() {
+    this.timesheetApp = this.dataSPYService.timesheet;
+    this.isEditable = this.timesheetApp.IsEditable;
+    this.tsLine = this.dataSPYService.timesheetLine;
+    for(let i = 1;i<8;i++){
+      if(this.tsLine["Hours"+i]){
+        this.tsLine['EnterHours' + i] = true;
+      }else{
+        this.tsLine["Hours"+i] = "";
+      }
+    }
+    var projSelected: TimesheetProject = {} as TimesheetProject;
+    projSelected.ProjId = this.tsLine.ProjId;
+    projSelected.ProjDescription = this.tsLine.ProjDescription;
+    this.getActivityList(projSelected);
+    this.timesheetPeriodList = this.dataSPYService.timesheetPeriodList;
+    /*
     this.sub0 = this.dataService.getTimesheetHeader$.subscribe(res => {
       this.timesheetApp = res;
       this.isEditable = this.timesheetApp.IsEditable;
-    });
-
+    });    
     this.sub = this.dataService.getTimesheetLine$.subscribe(res => {
       this.tsLine = res;
 
@@ -105,18 +101,17 @@ export class TimesheetLinePage implements OnInit {
       projSelected.ProjDescription = this.tsLine.ProjDescription;
       this.getActivityList(projSelected);
     })
-
     this.sub1 = this.dataService.getTimesheetPeriodList$.subscribe(res => {
       this.timesheetPeriodList = res;
-    })
+    })*/
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
-    this.sub1.unsubscribe();
-
+    //this.sub.unsubscribe();
+    //this.sub1.unsubscribe();
     if (this.timesheetUpdated) {
-      this.dataService.setTimesheetHeader(this.timesheetApp);
+      this.dataSPYService.timesheet = this.timesheetApp;
+      //this.dataService.setTimesheetHeader(this.timesheetApp);
       this.events.publish("timesheetAdded",true);
     } else {
       this.events.publish("timesheetAdded",false);
@@ -124,16 +119,14 @@ export class TimesheetLinePage implements OnInit {
   }
 
   async presentModal() {
-    const modal = await this.modalController.create({
+    const modal = await this.modalCtrl.create({
       component: SearchPage,
       componentProps: {
         'searchList': this.tsProject,
         'bindLabel': 'displayTxt',
       }
     });
-
     await modal.present();
-
     modal.onDidDismiss().then(dataReturned => {
       console.log(dataReturned);
       if (dataReturned.data) {
@@ -145,14 +138,18 @@ export class TimesheetLinePage implements OnInit {
   projSelected(project) {
     this.tsLine.ProjId = project.ProjId;
     this.tsLine.ProjDescription = project.ProjDescription;
-
     this.tsActivity = [];
     this.getActivityList(project);
   }
 
-  getProjectList() {
-    this.axService.getWorkerTimesheetProject(this.paramService.emp.WorkerId).subscribe(res => {
+  async getProjectList() {
+    await this.showLoadingView({ showOverlay: true });  
+    this.apiService.getWorkerTimesheetProject(this.dataSPYService.worker.WorkerId).subscribe(res => {
+      console.log(res);
+      this.dataSPYService.projectActivityList = res;
+      this.storageService.setProjectActivityList(res);
       this.projectActivityList = res;
+      this.dismissLoadingView(); 
       var unique = {}
       for (var i = 0; i < this.projectActivityList.length; i++) {
         var place = this.projectActivityList[i];
@@ -161,18 +158,17 @@ export class TimesheetLinePage implements OnInit {
       for (var name in unique) {
         var place = unique[name];
         let project: TimesheetProject = {} as TimesheetProject;
-
         project.ProjId = place.ProjId;
         project.ProjDescription = place.ProjDescription;
-
         project.displayTxt = place.ProjId + " - " + place.ProjDescription
         this.tsProject.push(project);
       }
-      console.log(res);
     }, (error) => {
-      console.log('Error - get worker project details: ' + error);
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
+
   getActivityList(tsProject: TimesheetProject) {
     var unique = {}
     for (var i = 0; i < this.projectActivityList.length; i++) {
@@ -181,6 +177,7 @@ export class TimesheetLinePage implements OnInit {
       }
     }
   }
+
   getCategory() {
 
   }
@@ -205,7 +202,6 @@ export class TimesheetLinePage implements OnInit {
       event: ev,
       translucent: true
     });
-
     popover.onDidDismiss().then((dataReturned) => {
       if (dataReturned.data) {
         console.log(dataReturned.data[0]);
@@ -240,13 +236,14 @@ export class TimesheetLinePage implements OnInit {
         }
       }
     });
-
     popover.style.cssText = '--min-width: 85%;--border-radius:5px';
     return await popover.present();
   }
+
   openComment(event, hours, internalComment, externalComment, i) {
     this.presentPopover(event, hours, internalComment, externalComment, i);
   }
+
   saveTimesheet() {
     if (this.validator()) {
       this.updateTimesheet();
@@ -254,38 +251,24 @@ export class TimesheetLinePage implements OnInit {
   }
 
   async updateTimesheet() {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-
-    });
-    await loading.present();
-
-    this.axService.updateWorkerTimesheet(this.timesheetApp).subscribe(res => {
-      loading.dismiss();
-      console.clear();
+    await this.showLoadingView({ showOverlay: true });  
+    this.apiService.updateWorkerTimesheet(this.timesheetApp).subscribe(res => {
       console.log(res);
+      this.dismissLoadingView(); 
       this.timesheetUpdated = true;
-
       this.router.navigateByUrl("/timesheet-home");
     }, error => {
-      loading.dismiss();
-      console.log(error);
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
+  
   validator() {
     if (!this.tsLine.ProjId) {
-      this.alertServ.errorToast("Project Cannot Be blank");
-    }
-    else if (!this.tsLine.ProjActivityId) {
-      this.alertServ.errorToast("Activity Cannot Be blank");
-    }
-    // else if (!this.tsLine.CategoryId) {
-    //   this.alertServ.errorToast("Category Cannot Be blank");
-    // }
-    else {
+      this.translate.get('PROJ_BLANK').subscribe(str => this.showToast(str)); 
+    } else if (!this.tsLine.ProjActivityId) {
+      this.translate.get('ACTIVITY_BLANK').subscribe(str => this.showToast(str)); 
+    } else {
       return true
     }
     return false;
@@ -298,9 +281,11 @@ export class TimesheetLinePage implements OnInit {
       }
     }
   }
+
   checkHrs(i){
     return this.tsLine['EnterHours' + i];
   }
+
   convert(i){
     return Number(i)+1;
   }

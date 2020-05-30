@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Injector } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/providers/dataService/data.service';
 import { AxService } from 'src/app/providers/axservice/ax.service';
@@ -6,20 +6,23 @@ import { LoadingController } from '@ionic/angular';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { AlertService } from 'src/app/providers/alert.service';
+import { BasePage } from '../../base/base.page';
 @Component({
   selector: 'leave-home-element',
   templateUrl: './leave-home-element.page.html',
   styleUrls: ['./leave-home-element.page.scss'],
 })
-export class LeaveHomeElementPage implements OnInit {
+export class LeaveHomeElementPage extends BasePage implements OnInit {
 
   @Input('leaveApp') leaveApp: LeaveAppTableContract;
   @Input('pageType') pageType: any;
 
   visible: boolean = false;
-  constructor(public router: Router, public dataService: DataService, public axService: AxService,
-    public paramService: ParameterService,
-    public alertServ: AlertService, public loadingController: LoadingController) { }
+  constructor(injector: Injector,
+    public loadingController: LoadingController,
+    private alertService: AlertService) { 
+      super(injector);
+    }
 
   ngOnInit() {
 
@@ -28,9 +31,10 @@ export class LeaveHomeElementPage implements OnInit {
   toggleCard() {
     this.visible = !this.visible;
   }
-  gotoLinePage(leaveDetails) {
-    this.dataService.setLeaveLineDetails(leaveDetails);
 
+  gotoLinePage(leaveDetails) {
+    //this.dataService.setLeaveLineDetails(leaveDetails);
+    this.dataSPYService.leaveApp = leaveDetails;
     if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_leave_edit/worker');
     } else {
@@ -40,22 +44,25 @@ export class LeaveHomeElementPage implements OnInit {
 
   resumtion() {
     this.leaveApp.ResumptionInitiated = true;
-    this.dataService.setLeaveEditDetails(this.leaveApp);
+    //this.dataService.setLeaveEditDetails(this.leaveApp);
+    this.dataSPYService.leaveApp = this.leaveApp;
     if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_leave_edit/worker');
     } else {
       this.router.navigateByUrl('leave-edit');
     }
   }
-  gotoEditPage(leaveDetails) {
-    this.dataService.setLeaveEditDetails(leaveDetails);
 
+  gotoEditPage(leaveDetails) {
+    //this.dataService.setLeaveEditDetails(leaveDetails);
+    this.dataSPYService.leaveApp = leaveDetails;
     if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_leave_edit/worker');
     } else {
       this.router.navigateByUrl('leave-edit');
     }
   }
+
   deleteLine(i) {
     this.presentAlertConfirmation("Delete Leave", "Are you sure you want to delete this leave line?", "deleteLine", i);
   }
@@ -69,41 +76,33 @@ export class LeaveHomeElementPage implements OnInit {
 
   async deleteLeaveCall() {
     this.leaveApp.IsDeleted = true;
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
-    this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
-      loading.dismiss();
-      this.alertServ.errorToast("Leave Deleted");
+    await this.showLoadingView({ showOverlay: true });    
+    this.apiService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
+      console.log(res);
+      this.dismissLoadingView(); 
+      this.translate.get('LEAVE_DELETED').subscribe(str => this.showToast(str));
     }, error => {
-
-      loading.dismiss();
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
 
   async submitLeaveCall() {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
+    await this.showLoadingView({ showOverlay: true });    
     this.leaveApp.Status = "SUBMITTED";
     this.leaveApp.IsEditable = false;
-    this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
-      loading.dismiss();
-      this.alertServ.errorToast("Leave Submitted");
+    this.apiService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
+      console.log(res);
+      this.dismissLoadingView(); 
+      this.translate.get('LEAVE_SUBMITTED').subscribe(str => this.showToast(str));
     }, error => {
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
 
   async presentAlertConfirmation(header, msg, type, i = null) {
-    this.alertServ.AlertConfirmation(header, msg).subscribe(res => {
+    this.alertService.AlertConfirmation(header, msg).subscribe(async res => {
       if (res) {
         if (type == "deleteLine") {
           if (this.leaveApp.LeaveApplicationLine.length == 1) {
@@ -111,14 +110,15 @@ export class LeaveHomeElementPage implements OnInit {
           } else {
             this.leaveApp.LeaveApplicationLine.splice(i, 1);
           }
-
           console.log(this.leaveApp)
-          this.axService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
-            this.alertServ.errorToast("Leave Line Deleted");
+          await this.showLoadingView({ showOverlay: true });  
+          this.apiService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
+            this.dismissLoadingView(); 
+            this.translate.get('LEAVE_LINE_DELETED').subscribe(str => this.showToast(str));
           }, error => {
-            this.alertServ.errorToast("Connection Error");
+            this.dismissLoadingView(); 
+            this.translate.get(error).subscribe(str => this.showToast(str));
           })
-
         } else if (type == "delete") {
           this.deleteLeaveCall();
         } else {
@@ -135,9 +135,8 @@ export class LeaveHomeElementPage implements OnInit {
         type: 'text',
         placeholder: 'Workflow Remarks'
       },
-
     ];
-    this.alertServ.ApprovalAlertConfirmation(header, msg, inputArr).subscribe(res => {
+    this.alertService.ApprovalAlertConfirmation(header, msg, inputArr).subscribe(res => {
       if (res) {
         if (type == "approve") {
           this.approveLeaveServiceCall(res.workflowRemarks)
@@ -149,48 +148,41 @@ export class LeaveHomeElementPage implements OnInit {
   }
 
   async approveLeaveServiceCall(workflowRemarks) {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
+    await this.showLoadingView({ showOverlay: true }); 
     this.leaveApp.Approved = true;
     this.leaveApp.WorkflowRemarks = workflowRemarks;
-    this.leaveApp.ApproveWorker = this.paramService.emp.WorkerId;
-    this.axService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
-      loading.dismiss();
+    this.leaveApp.ApproveWorker = this.dataSPYService.worker.WorkerId;
+    this.apiService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
+      console.log(res);
+      this.dismissLoadingView(); 
       this.leaveApp.InApprovalState = true;
-      this.alertServ.errorToast("Leave Approved successfully");
+      this.translate.get('LEAVE_APPROVED').subscribe(str => this.showToast(str));
     }, error => {
-      this.alertServ.errorToast("Connection Error");
-      loading.dismiss();
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
+
   async rejectLeaveServiceCall(workflowRemarks) {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
+    await this.showLoadingView({ showOverlay: true }); 
     this.leaveApp.Rejected = true;
     this.leaveApp.WorkflowRemarks = workflowRemarks;
-    this.leaveApp.RejectWorker = this.paramService.emp.WorkerId;
-    this.axService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
-      loading.dismiss();
-      this.leaveApp.InApprovalState = true;
-      this.alertServ.errorToast("Leave Rejected");
+    this.leaveApp.RejectWorker = this.dataSPYService.worker.WorkerId;
+    this.apiService.UpdateLeaveApplicationStatusWorker(this.leaveApp).subscribe(res => {
       console.log(res);
+      this.dismissLoadingView(); 
+      this.leaveApp.InApprovalState = true;
+      this.translate.get('LEAVE_REJECTED').subscribe(str => this.showToast(str));
     }, error => {
-      this.alertServ.errorToast("Connection Error");
-      loading.dismiss();
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
+
   approveLeave() {
     this.approvalAlertConfirmation("Approve Leave", "Do you want to approve this leave?", "approve");
-
   }
+
   rejectLeave() {
     this.approvalAlertConfirmation("Reject Leave", "Do you want to reject this leave?", "reject");
   }

@@ -63,9 +63,9 @@ export class LeaveAddPage extends BasePage implements OnInit {
         this.leaveLineAdd = true;
       }
     })*/
+    
     this.leaveList = this.dataSPYService.leaveAppList;
     this.getLeaveType(new Date());
-
   }
 
   @HostListener('change', ['$event'])
@@ -171,6 +171,7 @@ export class LeaveAddPage extends BasePage implements OnInit {
           this.router.navigateByUrl("leave-home");
         }
       } else {
+        this.dismissLoadingView(); 
         this.showToast(res);
       }
     }, error => {

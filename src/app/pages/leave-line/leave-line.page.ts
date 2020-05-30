@@ -1,46 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { DataService } from 'src/app/providers/dataService/data.service';
-
-import { AxService } from 'src/app/providers/axservice/ax.service';
+import { Component, OnInit, Injector } from '@angular/core';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
-
-import { Router, ActivatedRoute } from '@angular/router';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
+import { ActivatedRoute } from '@angular/router';
+import { BasePage } from '../base/base.page';
 
 @Component({
   selector: 'app-leave-line',
   templateUrl: './leave-line.page.html',
   styleUrls: ['./leave-line.page.scss'],
 })
-export class LeaveLinePage implements OnInit {
+export class LeaveLinePage extends BasePage implements OnInit {
   leaveApp:LeaveAppTableContract = {} as LeaveAppTableContract;
   sub:any;
   editable:boolean;
   pageType:any;
   colorList: any = [];
 
-  constructor(public dataService:DataService,public axService:AxService,public router: Router,private activateRoute: ActivatedRoute,
-   public paramService: ParameterService,) {
-
+  constructor(injector: Injector,
+    private activateRoute: ActivatedRoute) {
+      super(injector);
       this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
-      this.colorList = this.paramService.colorList;
+      this.colorList = this.dataSPYService.colorList;
      }
 
   ngOnInit() {
+    this.leaveApp = this.dataSPYService.leaveApp;      
+    this.editable = this.leaveApp.IsEditable;
+    /*
     this.sub = this.dataService.getLeaveLineDetails$.subscribe(res=>{
       this.leaveApp = res;
       console.log(res);
       this.editable = this.leaveApp.IsEditable;
-    });
+    });*/
   }
  
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    //this.sub.unsubscribe();
   }
 
   editLeaveLine() {    
-    this.dataService.setLeaveEditDetails(this.leaveApp);
-    
+    //this.dataService.setLeaveEditDetails(this.leaveApp);
+    this.dataSPYService.leaveApp = this.leaveApp;
     if(this.pageType=='worker'){
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_leave_edit/worker');
     }else{
@@ -49,7 +48,8 @@ export class LeaveLinePage implements OnInit {
   }
 
   addLeaveLine() {
-    this.dataService.setLeaveLineAddDetails(this.leaveApp);
+    //this.dataService.setLeaveLineAddDetails(this.leaveApp);
+    this.dataSPYService.leaveApp = this.leaveApp;
     if(this.pageType == 'manager'){
       this.router.navigateByUrl('/tab/tabs/manager-profile/manager_leave_add/manager');
     }else{

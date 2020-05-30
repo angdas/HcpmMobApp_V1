@@ -1,26 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injector } from '@angular/core';
 import { PopoverController, NavParams } from '@ionic/angular';
+import { BasePage } from '../../base/base.page';
 
 @Component({
   selector: 'app-comment',
   templateUrl: './comment.page.html',
   styleUrls: ['./comment.page.scss'],
 })
-export class CommentPageForLine implements OnInit {
+export class CommentPageForLine extends BasePage implements OnInit {
 
-  hours:any;
-  internalComment:any;
-  externalComment:any;
+  public hours:any;
+  public internalComment:any;
+  public externalComment:any;
 
-  constructor(private popoverController: PopoverController, private navParams: NavParams) { }
+  constructor(injector: Injector, 
+    private popoverController: PopoverController, 
+    private navParams: NavParams) { 
+      super(injector);
+    }
 
   ngOnInit() {
-
     this.hours = this.navParams.data.Hours;
     this.internalComment = this.navParams.data.InternalComment;
     this.externalComment = this.navParams.data.ExternalComment;
   }
-
 
   async closePopup() {
     if(this.hours){

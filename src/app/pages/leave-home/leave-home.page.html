@@ -13,10 +13,7 @@
             refreshingSpinner="circles" refreshingText="Refreshing...">
         </ion-refresher-content>
     </ion-refresher>
-
     <ion-searchbar mode="ios" [(ngModel)]="searchedItem"></ion-searchbar>
-
-
     <div *ngIf="pageType != 'worker'">
         <ion-segment [(ngModel)]="selectedTab">
             <ion-segment-button value="all">
@@ -39,7 +36,6 @@
                 <div *ngSwitchCase="'all'">
                     <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
                 </div>
-
                 <div *ngSwitchCase="'created'">
                     <div *ngIf="(leave.Status | uppercase) =='CREATED'">
                         <leave-home-element [leaveApp]="leave" [pageType]="pageType"></leave-home-element>
@@ -57,7 +53,6 @@
                 </div>
             </div>
         </div>
-
     </ng-container>
 
     <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addLeave()" *ngIf="pageType != 'worker'">

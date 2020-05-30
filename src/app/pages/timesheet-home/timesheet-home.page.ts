@@ -4,7 +4,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
 import { IonSlides } from '@ionic/angular';
-import { EmployeeModel } from 'src/app/models/worker/worker.interface';
 import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 import { WorkerPeriod } from 'src/app/models/timesheet/workerPeriod.model';
 import { Events } from 'src/app/providers/events/event.service';
@@ -22,10 +21,8 @@ export class TimesheetHomePage extends BasePage implements OnInit {
   selectedTab = 'all';
   showDetails: boolean = false;
   timesheetList: TimesheetTableContact[] = [];
-
   timesheetPeriodList: TimesheetPeriodDate[] = [];
   authenticated: boolean;
-
   public myworkerTimesheetList: TimesheetTableContact[];
   pageType: any;
   selectedPeriod: WorkerPeriod;
@@ -35,17 +32,16 @@ export class TimesheetHomePage extends BasePage implements OnInit {
     public paramService: ParameterService, 
     public events: Events,
     private activateRoute: ActivatedRoute) {
-      super(injector);
+      super(injector);      
       this.events.subscribe('timesheetAdded', (res) => {
-        if (res) {
-          /*
+        if (res) {    
+          this.timesheetList = this.dataSPYService.timesheetList;
+          /*     
           this.dataSPYService.getTimesheetList$.subscribe(res => {
             this.timesheetList = res;
           });*/
         }
-
     })
-
     this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
@@ -104,6 +100,8 @@ export class TimesheetHomePage extends BasePage implements OnInit {
       this.dismissLoadingView();
       this.showDetails = true;
       this.timesheetPeriodList = this.getTimesheetPeriodDateList(this.selectedPeriod.PeriodFrom, this.selectedPeriod.PeriodTo);      
+      this.dataSPYService.timesheetPeriodList = this.timesheetPeriodList;
+      this.storageService.setTimesheetPeriodList(this.timesheetPeriodList);
     }, (error) => {
       this.dismissLoadingView(); 
       this.translate.get(error).subscribe(str => this.showToast(str));

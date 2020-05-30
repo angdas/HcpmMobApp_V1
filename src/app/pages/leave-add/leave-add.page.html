@@ -21,21 +21,14 @@
         {{ date.day }}
       </span>
     </ng-template> -->
-
-
-
     <ion-item class="itbr" (click)="openCalendar()">
         <ion-label position="floating">Start Date</ion-label>
         <ion-input [readonly]="true" [value]="leaveLine.StartDate | date:'fullDate'"></ion-input>
-
     </ion-item>
-
     <ion-item class="itbr" (click)="openCalendar()">
         <ion-label position="floating">End Date</ion-label>
         <ion-input [readonly]="true" [value]="leaveLine.EndDate | date:'fullDate'"></ion-input>
     </ion-item>
-
-
     <ion-item class="itbr">
         <ion-label position="floating">Leave Type</ion-label>
         <ion-select okText="Okay" cancelText="Dismiss" interface="action-sheet"
@@ -46,20 +39,15 @@
             </ion-select-option>
         </ion-select>
     </ion-item>
-
-
     <ion-item class="itbr" *ngIf="compareDate() && leaveLine.StartDate">
         <ion-label position="floating">Hours</ion-label>
         <ion-input [min]="0" [max]="24" [(ngModel)]="leaveLine.Hours"></ion-input>
     </ion-item>
 
-
     <ion-item class="itbr">
         <ion-label position="floating">Remarks</ion-label>
         <ion-textarea [(ngModel)]="leaveLine.Remarks"></ion-textarea>
     </ion-item>
-
-
     <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="submitLeave()">
         <ion-fab-button size="small">
             <ion-icon name="save"></ion-icon>

@@ -1,11 +1,5 @@
-import { Component, OnInit, ɵConsole, HostListener, Injector } from '@angular/core';
-
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { Observable } from 'rxjs';
+import { Component, OnInit, HostListener, Injector } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormControl } from '@angular/forms';
-import { startWith, map } from 'rxjs/operators';
 import { DocumentRequestType } from 'src/app/models/Document Request/documentRequestType.model';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
 import { DocumentRequestLine } from 'src/app/models/Document Request/documentRequestLine.model';
@@ -22,17 +16,12 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
 
   public docRequestTypeList: DocumentRequestType[] = [];
   public docReqAddressTypeList: DocumentAddressModel[] = [];
-
-  documentList: DocumentRequestModel[] = [];
-  //sub: any;
-  //sub1: any;
-
-  newDocReq: DocumentRequestModel = {} as DocumentRequestModel;
-  newDocLine: DocumentRequestLine = {} as DocumentRequestLine;
-
-  pageType: any;
-  documentLineAdd: boolean;
-  dataChangeNotSaved: boolean = false;
+  public documentList: DocumentRequestModel[] = [];
+  public newDocReq: DocumentRequestModel = {} as DocumentRequestModel;
+  public newDocLine: DocumentRequestLine = {} as DocumentRequestLine;
+  public pageType: any;
+  public documentLineAdd: boolean;
+  public dataChangeNotSaved: boolean = false;
 
   constructor(injector: Injector,
     public router: Router,
@@ -44,6 +33,9 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
 
   ngOnInit() {
     this.getDocumentRequestTypeNaddress();
+    this.documentList = this.dataSPYService.documentList;
+    //this.newDocReq = this.dataSPYService.documentReq;
+    //this.documentLineAdd = true;
     /*
     this.sub = this.dataService.getDocumentDetailsList$.subscribe(res => {
       this.documentList = res;
@@ -67,13 +59,11 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-
       this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
         ret = res;
       })
     }
     else ret = true;
-
     return ret;
   }
 
@@ -89,24 +79,27 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
     }*/
   }
 
-  getDocumentRequestTypeNaddress() {
+  async getDocumentRequestTypeNaddress() {
+    await this.showLoadingView({ showOverlay: true });  
     this.apiService.getDocRequestType().subscribe(res => {
+      console.log(res);
       this.dataSPYService.docRequestTypeList = res;
       this.storageService.setDocRequestTypeList(res);
       this.docRequestTypeList = res;
-      console.log(res);
+      this.apiService.getDocumentRequestAddress().subscribe(res => {
+        console.log(res);
+        this.dataSPYService.docReqAddressTypeList = res;
+        this.storageService.setDocReqAddressTypeList(res);
+        this.docReqAddressTypeList = res;    
+        this.dismissLoadingView();   
+      }, error => {
+        this.dismissLoadingView(); 
+        this.translate.get(error).subscribe(str => this.showToast(str)); 
+      })
     }, error => {
-      this.translate.get(error).subscribe(str => this.showToast(str));
-    })
-
-    this.apiService.getDocumentRequestAddress().subscribe(res => {
-      this.dataSPYService.docReqAddressTypeList = res;
-      this.storageService.setDocReqAddressTypeList(res);
-      this.docReqAddressTypeList = res;
-      console.log(res);
-    }, error => {
-      this.translate.get(error).subscribe(str => this.showToast(str));
-    })
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
+    })    
   }
 
 

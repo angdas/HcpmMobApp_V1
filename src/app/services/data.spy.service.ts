@@ -9,6 +9,9 @@ import { WorkerPeriod } from '../models/timesheet/workerPeriod.model';
 import { DocumentRequestModel } from '../models/Document Request/documentRequest.model';
 import { DocumentRequestType } from '../models/Document Request/documentRequestType.model';
 import { DocumentAddressModel } from '../models/Document Request/documentAddress.model';
+import { TimesheetProject } from '../models/timesheet/tsProject.interface';
+import { TimesheetPeriodDate } from '../models/timesheet/tsPeriodDate.interface';
+import { TimesheetLine } from '../models/timesheet/tsLineListContact.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +33,19 @@ export class DataSPYService {
   public myWorkerLeaveAppList: LeaveAppTableContract[];
   public timesheetList: TimesheetTableContact[];
   public periodList: WorkerPeriod[];
+  public timesheetPeriodList: TimesheetPeriodDate[];
   public myworkerTimesheetList: TimesheetTableContact[];
+  public projectActivityList: TimesheetProject[];
   public documentList: DocumentRequestModel[];
   public myWorkerDocumentList: DocumentRequestModel[];
   public docRequestTypeList: DocumentRequestType[];
   public docReqAddressTypeList: DocumentAddressModel[];
   public colorList: any=[];
+
+  public leaveApp: LeaveAppTableContract;
+  public documentReq: DocumentRequestModel;
+  public timesheet: TimesheetTableContact;
+  public timesheetLine: TimesheetLine;
 
   constructor() { 
     this.colorList=[];

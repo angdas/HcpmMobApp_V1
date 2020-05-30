@@ -247,4 +247,79 @@ export class ApiService {
     return this.http.post(url, body, httpOptions);
   }
 
+  updateLeaveAttachment(attachment): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/UpdateLeaveApplicationAttachment';
+    let body = JSON.stringify(attachment);
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
+  UpdateLeaveApplicationStatusWorker(contract): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/UpdateLeaveApplicationStatus';
+    let body = JSON.stringify(contract);
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
+  UpdateHRRequestStatus(contract): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/UpdateHRRequestStatus';
+    let body = JSON.stringify(contract);
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
+  getWorkerTimesheetProject(id): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/GetWorkerProject';
+    let body = { 
+      "WorkerId": id,
+      "DataArea": this.dataSPYService.workerDataArea
+   };
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
+  updateWorkerTimesheet(TimesheetTableContact): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/UpdateTimeSheet';
+    let body = JSON.stringify(TimesheetTableContact);
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
+  UpdateTSApplicationStatusWorker(contract): Observable<any> {
+    let url = this.dataSPYService.clientconfig.api + 'api/HCPM/UpdateTimesheetStatus';
+    let body = JSON.stringify(contract);
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'Application/json'
+      })
+    };
+    console.log(JSON.stringify(body))
+    return this.http.post(url, body, httpOptions);
+  }
+
 }

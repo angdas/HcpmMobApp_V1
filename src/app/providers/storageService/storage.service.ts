@@ -13,6 +13,8 @@ import { WorkerPeriod } from 'src/app/models/timesheet/workerPeriod.model';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
 import { DocumentRequestType } from 'src/app/models/Document Request/documentRequestType.model';
 import { DocumentAddressModel } from 'src/app/models/Document Request/documentAddress.model';
+import { TimesheetProject } from 'src/app/models/timesheet/tsProject.interface';
+import { TimesheetPeriodDate } from 'src/app/models/timesheet/tsPeriodDate.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -342,5 +344,21 @@ export class StorageService {
 
   setDocReqAddressTypeList(val: DocumentAddressModel[]) {
     return this.storage.set('spyDocReqAddressTypeList', val);
+  }
+
+  getProjectActivityList(): Promise<TimesheetProject[]> {
+    return this.storage.get('spyProjectActivityList');
+  }
+
+  setProjectActivityList(val: TimesheetProject[]) {
+    return this.storage.set('spyProjectActivityList', val);
+  }
+
+  getTimesheetPeriodList(): Promise<TimesheetPeriodDate[]> {
+    return this.storage.get('spyTimesheetPeriodList');
+  }
+
+  setTimesheetPeriodList(val: TimesheetPeriodDate[]) {
+    return this.storage.set('spyTimesheetPeriodList', val);
   }
 }

@@ -1,26 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Injector } from '@angular/core';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
-import { Router } from '@angular/router';
-import { ToastController, AlertController, LoadingController } from '@ionic/angular';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { AlertService } from 'src/app/providers/alert.service';
+import { BasePage } from '../../base/base.page';
 
 @Component({
   selector: 'document-request-element',
   templateUrl: './document-request-element.page.html',
   styleUrls: ['./document-request-element.page.scss'],
 })
-export class DocumentRequestElementPage implements OnInit {
+export class DocumentRequestElementPage extends BasePage implements OnInit {
 
   @Input('documentRequest') documentReq: DocumentRequestModel;
   @Input('pageType') pageType: any;
 
-  constructor(public router: Router, public dataService: DataService, public axService: AxService,
-    public paramService: ParameterService,
-    public alertServ: AlertService, public loadingController: LoadingController) {
-
+  constructor(injector: Injector,
+    public alertService: AlertService) {
+      super(injector);
   }
 
   ngOnInit() {
@@ -34,42 +29,35 @@ export class DocumentRequestElementPage implements OnInit {
   }
 
   async deleteRequestCall() {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
+    await this.showLoadingView({ showOverlay: true });  
     this.documentReq.IsDeleted = true;
-    this.axService.updateDocumentRequest(this.documentReq).subscribe(res => {
-      loading.dismiss();
-      this.alertServ.errorToast("Document Deleted");
+    this.apiService.updateDocumentRequest(this.documentReq).subscribe(res => {
+      console.log(res);
+      this.dismissLoadingView();   
+      this.translate.get('HRREQ_DELETED').subscribe(str => this.showToast(str));  
     }, error => {
       this.documentReq.IsDeleted = false;
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
 
   async submitRequestCall() {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
+    await this.showLoadingView({ showOverlay: true });  
     this.documentReq.IsEditable = false;
     this.documentReq.Status = "SUBMITTED";
-    this.axService.updateDocumentRequest(this.documentReq).subscribe(res => {
-      loading.dismiss();
-      this.alertServ.errorToast("Request Submitted successfully");
+    this.apiService.updateDocumentRequest(this.documentReq).subscribe(res => {
+      console.log(res);
+      this.dismissLoadingView();  
+      this.translate.get('HRREQ_SUBMITTED').subscribe(str => this.showToast(str));  
     }, error => {
-      loading.dismiss();
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
 
   async presentAlertConfirmation(header, msg, type) {
-    this.alertServ.AlertConfirmation(header, msg).subscribe(res => {
+    this.alertService.AlertConfirmation(header, msg).subscribe(res => {
       if (res) {
         if (type == "delete") {
           this.deleteRequestCall()
@@ -81,7 +69,8 @@ export class DocumentRequestElementPage implements OnInit {
   }
 
   gotoRequestLinePage() {
-    this.dataService.setDocumentDetails(this.documentReq);
+    this.dataSPYService.documentReq = this.documentReq;
+    //this.dataService.setDocumentDetails(this.documentReq);
     if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_document_request_line/worker');
     } else {
@@ -96,9 +85,8 @@ export class DocumentRequestElementPage implements OnInit {
         type: 'text',
         placeholder: 'Workflow Remarks'
       },
-
     ];
-    this.alertServ.ApprovalAlertConfirmation(header, msg,inputArr).subscribe(res => {
+    this.alertService.ApprovalAlertConfirmation(header, msg,inputArr).subscribe(res => {
       if (res) {
         if (type == "approve") {
           this.approveDocumentReqServiceCall(res.workflowRemarks)
@@ -108,55 +96,45 @@ export class DocumentRequestElementPage implements OnInit {
       }
     })
   }
-  async approveDocumentReqServiceCall(workflowRemarks) {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
 
+  async approveDocumentReqServiceCall(workflowRemarks) {
+    await this.showLoadingView({ showOverlay: true });  
     this.documentReq.Approved = true;
     this.documentReq.WorkflowRemarks = workflowRemarks;
-    this.documentReq.ApproveWorker = this.paramService.emp.WorkerId;
-    this.axService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
-      loading.dismiss();
-      this.alertServ.errorToast("Request Approved successfully");
-      this.documentReq.InApprovalState = true;
+    this.documentReq.ApproveWorker = this.dataSPYService.worker.WorkerId;
+    this.apiService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
       console.log(res);
+      this.documentReq.InApprovalState = true;
+      this.dismissLoadingView(); 
+      this.translate.get('HRREQ_APPROVED').subscribe(str => this.showToast(str)); 
     }, error => {
-      loading.dismiss();
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
-
 
   async rejectDocumentReqServiceCall(workflowRemarks) {
-    const loading = await this.loadingController.create({
-      spinner: "lines",
-      duration: 3000,
-      message: 'Please wait...',
-    });
-    await loading.present();
-
+    await this.showLoadingView({ showOverlay: true });  
     this.documentReq.Rejected = true;
     this.documentReq.WorkflowRemarks = workflowRemarks;
-    this.documentReq.RejectWorker = this.paramService.emp.WorkerId;
-    this.axService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
-      loading.dismiss();
-      this.documentReq.InApprovalState = true;
-      this.alertServ.errorToast("Request Rejected");
+    this.documentReq.RejectWorker = this.dataSPYService.worker.WorkerId;
+    this.apiService.UpdateHRRequestStatus(this.documentReq).subscribe(res => {
       console.log(res);
+      this.documentReq.InApprovalState = true;
+      this.dismissLoadingView(); 
+      this.translate.get('HRREQ_REJECTED').subscribe(str => this.showToast(str)); 
     }, error => {
-      loading.dismiss();
-      this.alertServ.errorToast("Connection Error");
+      this.dismissLoadingView(); 
+      this.translate.get(error).subscribe(str => this.showToast(str)); 
     })
   }
+
   approveRequest() {
     this.approvalAlertConfirmation("Approve Request", "Do you want to approve this Request?", "approve");
-
   }
+
   rejectRequest() {
     this.approvalAlertConfirmation("Reject Request", "Do you want to reject this Request?", "reject");
   }
+
 }

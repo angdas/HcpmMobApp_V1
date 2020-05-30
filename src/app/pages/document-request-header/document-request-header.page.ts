@@ -23,8 +23,9 @@ export class DocumentRequestHeaderPage extends BasePage implements OnInit {
       this.colorList = this.dataSPYService.colorList;
   }
 
-
   ngOnInit() {
+    this.documentReq = this.dataSPYService.documentReq;
+    this.editable = this.documentReq.IsEditable;
     /*
     this.sub = this.dataService.getDocumentDetails$.subscribe(res => {
       this.documentReq = res;
@@ -33,11 +34,11 @@ export class DocumentRequestHeaderPage extends BasePage implements OnInit {
   }
   
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    //this.sub.unsubscribe();
   }
 
   editRequestLine(){
-
+    this.dataSPYService.documentReq = this.documentReq;
     //this.dataService.setDocumentDetails(this.documentReq);
     if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_document_request_line/worker');
@@ -47,7 +48,7 @@ export class DocumentRequestHeaderPage extends BasePage implements OnInit {
   }
 
   addRequestLine() {
-    
+    this.dataSPYService.documentReq = this.documentReq;
     //this.dataService.setDocumentReqLineAddDetails(this.documentReq);
     if (this.pageType == 'manager'){
       this.router.navigateByUrl('/tab/tabs/manager-profile/manager_document_request_add/manager');
