@@ -30,6 +30,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SafariViewController } from '@ionic-native/safari-view-controller/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { OffileInterceptorService } from './services/offile-interceptor.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -54,6 +56,7 @@ export function createTranslateLoader(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [
     File,
