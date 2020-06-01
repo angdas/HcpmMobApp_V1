@@ -30,8 +30,8 @@ export class LeaveEditPage extends BasePage implements OnInit {
     private camera: Camera,
     public actionSheetController: ActionSheetController,
     private file: File) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+    super(injector);
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
   ngOnInit() {
@@ -63,7 +63,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret: boolean;
     if (this.dataChangeNotSaved) {
-        this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
         ret = res;
       })
     }
@@ -121,13 +121,13 @@ export class LeaveEditPage extends BasePage implements OnInit {
   }
 
   async updateLeaveDetails() {
-    await this.showLoadingView({ showOverlay: true }); 
-    this.apiService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {      
+    await this.showLoadingView({ showOverlay: true });
+    this.apiService.updateEmplLeaveAppl(this.leaveApp).subscribe(res => {
       console.log(res);
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       if (res && this.resupmtion) {
         this.resumptionUpdated = true;
-      }        
+      }
       this.translate.get('LEAVE_SAVED').subscribe(str => this.showAlert(str));
       if (this.pageType == "manager") {
         this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
@@ -135,7 +135,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
         this.router.navigateByUrl("leave-home");
       }
     }, error => {
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
@@ -149,18 +149,8 @@ export class LeaveEditPage extends BasePage implements OnInit {
       mediaType: this.camera.MediaType.PICTURE
     }
     this.camera.getPicture(options).then(async (imageData) => {
-      await this.showLoadingView({ showOverlay: true }); 
-      let atttachment = {} as LeaveAttachmentModel;
-      atttachment.Attachments = imageData;
-      atttachment.DataArea = this.dataSPYService.workerDataArea;
-      atttachment.FileExtension = "jpeg";
-      atttachment.TableNumber = this.leaveApp.Number;
-      this.apiService.updateLeaveAttachment(atttachment).subscribe(res => {
-        console.log(res);
-      }, error => {
-        this.dismissLoadingView(); 
-        this.translate.get(error).subscribe(str => this.showToast(str));
-      })
+      await this.showLoadingView({ showOverlay: true });
+      this.uploadAttachment(imageData);
       // imageData is either a base64 encoded string or a file URI
       // If it's base64 (DATA_URL):
       // let base64Image = 'data:image/jpeg;base64,' + imageData;
@@ -168,27 +158,59 @@ export class LeaveEditPage extends BasePage implements OnInit {
     });
   }
 
-  async selectImage() {
-    const actionSheet = await this.actionSheetController.create({
-      header: "Select Image source",
-      buttons: [{
-        text: 'Load from Library',
-        handler: () => {
-          this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY);
+  async selectImage(file) {
+    if (this.isCordova()) {
+      const actionSheet = await this.actionSheetController.create({
+        header: "Select Image source",
+        buttons: [{
+          text: 'Load from Library',
+          handler: () => {
+            this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY);
+          }
+        },
+        {
+          text: 'Use Camera',
+          handler: () => {
+            this.pickImage(this.camera.PictureSourceType.CAMERA);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
         }
-      },
-      {
-        text: 'Use Camera',
-        handler: () => {
-          this.pickImage(this.camera.PictureSourceType.CAMERA);
-        }
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel'
-      }
-      ]
+        ]
+      });
+      await actionSheet.present();
+    } else
+      file.click();
+  }
+
+  getSelectedImg(ev) {
+    this.getBase64(ev.target.files[0]).then(
+      imageData => this.uploadAttachment(imageData)
+    );
+  }
+  getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
     });
-    await actionSheet.present();
+  }
+
+
+  uploadAttachment(imageData) {
+    let atttachment = {} as LeaveAttachmentModel;
+    atttachment.Attachments = imageData;
+    atttachment.DataArea = this.dataSPYService.workerDataArea;
+    atttachment.FileExtension = "jpeg";
+    atttachment.TableNumber = this.leaveApp.Number;
+    this.apiService.updateLeaveAttachment(atttachment).subscribe(res => {
+      console.log(res);
+    }, error => {
+      this.dismissLoadingView();
+      this.translate.get(error).subscribe(str => this.showToast(str));
+    })
   }
 }

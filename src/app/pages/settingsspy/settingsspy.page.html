@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content>
-  <div style="margin:10px" *ngIf="!this.dataSPYService.isAuthenticated;else validUser">
+  <div style="margin:10px" *ngIf="!dataSPYService.isAuthenticated;else validUser">
     <ion-item>
       <ion-label position="floating">Client Id</ion-label>
       <ion-input type="text" [(ngModel)]="clientConfig.clientId" placeholder="Enter Client ID" #clientId></ion-input>
@@ -27,8 +27,8 @@
   <ng-template #validUser>
     <ion-item>      
       <ion-label>Legal Entity</ion-label>
-      <ion-select [value]="dataSPYService.workerDataArea" [(ngModel)]="dataSPYService.workerDataArea" interface="action-sheet" (ionChange)="legalEntityChanged()">
-        <ion-select-option *ngFor="let employementList of dataSPYService.worker.WorkerEmployement" [value]="employementList"> {{employementList.DataArea}}
+      <ion-select [(ngModel)]="dataSPYService.workerDataArea" interface="action-sheet" (ionChange)="legalEntityChanged()">
+        <ion-select-option *ngFor="let employementList of dataSPYService.worker.WorkerEmployement" [value]="employementList.DataArea"> {{employementList.DataArea}
         </ion-select-option>
       </ion-select>
     </ion-item>

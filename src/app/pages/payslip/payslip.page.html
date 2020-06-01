@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Payslip</ion-title>
-    <ion-buttons slot="start" >
+    <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
@@ -15,10 +15,12 @@
     </ion-datetime>
   </ion-item>
 
-  <div *ngIf="payslip.length ; else noPayroll">
-    <ion-item (click)="downloadPayslip()" lines="none">
-      <ion-label><u>Download as PDF</u></ion-label>
-    </ion-item>
+  <div *ngIf="payslip.length ; else noPayroll" style="margin-top: 30px;">
+
+    <ion-button expand="block" color="success" (click)="downloadPayslip()" class="downloadBtn">
+      <ion-icon name="cloud-download-outline"></ion-icon>
+      <span>Download</span>
+    </ion-button>
   </div>
   <ng-template #noPayroll>
     <div class="noData">

@@ -33,3 +33,12 @@
         overflow-y: hidden;
     }
 
+    .downloadBtn{
+        ion-icon{
+            color: white !important;
+        }
+        span{
+            color: white !important;
+            margin-left: 10px;
+        }
+    }

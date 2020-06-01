@@ -38,6 +38,7 @@ export class SettingsspyPage extends BasePage implements OnInit {
     if(!this.dataSPYService.isAuthenticated){      
       this.clientIdInput.setFocus();
     }
+    console.log(this.dataSPYService.workerDataArea)
   }
 
   async getClientUrl() {
