@@ -27,8 +27,8 @@
   <ng-template #validUser>
     <ion-item>      
       <ion-label>Legal Entity</ion-label>
-      <ion-select [value]="this.dataSPYService.workerDataArea" [(ngModel)]="this.dataSPYService.workerDataArea" interface="action-sheet" (ionChange)="legalEntityChanged()">
-        <ion-select-option *ngFor="let employementList of this.dataSPYService.worker.WorkerEmployement" [value]="employementList"> {{employementList.DataArea}}
+      <ion-select [value]="dataSPYService.workerDataArea" [(ngModel)]="dataSPYService.workerDataArea" interface="action-sheet" (ionChange)="legalEntityChanged()">
+        <ion-select-option *ngFor="let employementList of dataSPYService.worker.WorkerEmployement" [value]="employementList"> {{employementList.DataArea}}
         </ion-select-option>
       </ion-select>
     </ion-item>
