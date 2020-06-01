@@ -1,18 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, Injector } from '@angular/core';
 import { EmployeeModel } from 'src/app/models/worker/worker.interface';
-import { AxService } from 'src/app/providers/axservice/ax.service';
-import { DataService } from 'src/app/providers/dataService/data.service';
-import { ParameterService } from 'src/app/providers/parameterService/parameter.service';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 import { TimesheetTableContact } from 'src/app/models/timesheet/tsTableContract.interface';
 import { DocumentRequestModel } from 'src/app/models/Document Request/documentRequest.model';
+import { BasePage } from '../../base/base.page';
+
 @Component({
   selector: 'app-my-workers',
   templateUrl: './my-workers.page.html',
   styleUrls: ['./my-workers.page.scss'],
 })
-export class MyWorkersPage implements OnInit {
+export class MyWorkersPage extends BasePage implements OnInit {
 
   myWorkersDetails: EmployeeModel[] = [];
 
@@ -25,9 +23,9 @@ export class MyWorkersPage implements OnInit {
   hrReqPending: any = 0;
 
   
-  constructor(public axService: AxService, public dataService: DataService, public paramService: ParameterService) {
-      
-     }
+  constructor(injector: Injector) {
+      super(injector);
+    }
 
   ngOnInit() {
     
@@ -39,27 +37,26 @@ export class MyWorkersPage implements OnInit {
     this.myWorkersDocRequest();
   }
 
-
   myWorkersLeave() {
-    this.axService.GetMyWorkersLeaveApprovals(this.paramService.emp.WorkerId).subscribe(res => {
-      this.workerLeaveList = res;
-      console.log("hi")
+    this.apiService.GetMyWorkersLeaveApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {
+      console.log(res);
+      this.workerLeaveList = res;      
       this.leavePending = this.workerLeaveList.length;
     })
   }
 
   myWorkersTimesheet() {
-    this.axService.GetMyWorkersTimesheetApprovals(this.paramService.emp.WorkerId).subscribe(res => {
+    this.apiService.GetMyWorkersTimesheetApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {
+      console.log(res);
       this.myworkerTimesheetList = res;
-
       this.timesheetPending = this.myworkerTimesheetList.length;
     })
   }
 
   myWorkersDocRequest() {
-    this.axService.GetMyWorkersDocRequest(this.paramService.emp.WorkerId).subscribe(res => {
-      this.workerDocumentList = res;
-      
+    this.apiService.GetMyWorkersDocRequest(this.dataSPYService.worker.WorkerId).subscribe(res => {
+      console.log(res);
+      this.workerDocumentList = res;      
       this.hrReqPending = this.workerDocumentList.length;
     })
   }
