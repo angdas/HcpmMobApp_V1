@@ -5,6 +5,7 @@ import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { PayslipModel } from 'src/app/models/worker/workerPayroll.interface';
 import { BasePage } from '../base/base.page';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-payslip',
@@ -18,11 +19,11 @@ export class PayslipPage extends BasePage implements OnInit {
   public payslip: PayslipModel[] = [];
 
   constructor(injector: Injector,
-    private activateRoute: ActivatedRoute, 
-    private opener: FileOpener, 
+    private activateRoute: ActivatedRoute,
+    private opener: FileOpener,
     private file: File) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+    super(injector);
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
   ngOnInit() {
@@ -36,23 +37,33 @@ export class PayslipPage extends BasePage implements OnInit {
   }
 
   downloadPayslip() {
-    this.saveAndOpenPdf(this.payslip[0].Payslip, "payslip.pdf")
+    if (this.isCordova()) {
+      this.saveAndOpenPdf(this.payslip[0].Payslip, "payslip.pdf")
+    } else {
+      const linkSource = 'data:application/pdf;base64,' + this.payslip[0].Payslip;
+      const downloadLink = document.createElement("a");
+      const fileName = "sample.pdf";
+
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    }
   }
 
   async saveAndOpenPdf(pdf: string, filename: string) {
-    await this.showLoadingView({ showOverlay: true });    
+    await this.showLoadingView({ showOverlay: true });
     const writeDirectory = this.isIos() ? this.file.dataDirectory : this.file.externalDataDirectory;
     this.file.writeFile(writeDirectory, filename, this.convertBaseb64ToBlob(pdf, 'application/pdf'), { replace: true })
       .then(() => {
-        this.dismissLoadingView(); 
+        this.dismissLoadingView();
         this.opener.open(writeDirectory + filename, 'application/pdf').then((val) => {
-            console.log(val);
+          console.log(val);
         }).catch(() => {
-            this.dismissLoadingView(); 
-            console.log('Error opening pdf file');
+          this.dismissLoadingView();
+          console.log('Error opening pdf file');
         });
       }).catch(() => {
-        this.dismissLoadingView(); 
+        this.dismissLoadingView();
         console.error('Error writing pdf file');
       });
   }

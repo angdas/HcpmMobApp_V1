@@ -62,7 +62,8 @@ ion-card,ion-card-header,ion-card-subtitle,ion-card-title,ion-card-content {
     --padding-end: 16px;
   }
   ion-button{
-    --background : linear-gradient(to bottom ,#506bc5,#0e193a)
+    --background : linear-gradient(to bottom ,#506bc5,#0e193a);
+    color: white;
   }
   ion-item{
     --border-color:#777777;

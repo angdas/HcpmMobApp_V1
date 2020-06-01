@@ -89,7 +89,9 @@
     "plugins": {
       "cordova-sqlite-storage": {},
       "cordova-plugin-file": {},
-      "cordova-plugin-file-opener2": {},
+      "cordova-plugin-file-opener2": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
+      },
       "cordova-plugin-app-version": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-statusbar": {},

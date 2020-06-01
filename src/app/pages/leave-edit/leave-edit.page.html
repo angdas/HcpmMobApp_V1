@@ -16,7 +16,7 @@
         </ng-template>
 
         <ion-buttons slot="end">
-            <ion-button color="danger" fill="outline" [disabled]="!editable" (click)="selectImage()">
+            <ion-button color="danger" fill="outline" [disabled]="!editable" (click)="selectImage(file)">
                 <ion-icon name="attach-outline"></ion-icon>
             </ion-button>
         </ion-buttons>
@@ -89,5 +89,5 @@
             <ion-icon name="add"></ion-icon>
         </ion-fab-button>
     </ion-fab>
-
+    <input type="file" style="visibility: hidden;" accept="image/*" #file (change)="getSelectedImg($event)"> 
 </ion-content>
