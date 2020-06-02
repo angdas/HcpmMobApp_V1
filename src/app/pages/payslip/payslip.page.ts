@@ -42,7 +42,7 @@ export class PayslipPage extends BasePage implements OnInit {
     } else {
       const linkSource = 'data:application/pdf;base64,' + this.payslip[0].Payslip;
       const downloadLink = document.createElement("a");
-      const fileName = "sample.pdf";
+      const fileName = "payslip.pdf";
 
       downloadLink.href = linkSource;
       downloadLink.download = fileName;

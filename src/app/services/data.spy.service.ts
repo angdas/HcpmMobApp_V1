@@ -34,7 +34,7 @@ export class DataSPYService {
   public timesheetList: TimesheetTableContact[];
   public periodList: WorkerPeriod[];
   public timesheetPeriodList: TimesheetPeriodDate[];
-  public myworkerTimesheetList: TimesheetTableContact[];
+  public myWorkerTimesheetList: TimesheetTableContact[];
   public projectActivityList: TimesheetProject[];
   public documentList: DocumentRequestModel[];
   public myWorkerDocumentList: DocumentRequestModel[];

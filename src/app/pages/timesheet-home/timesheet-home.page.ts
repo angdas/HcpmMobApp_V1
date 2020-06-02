@@ -54,7 +54,7 @@ export class TimesheetHomePage extends BasePage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.myworkerTimesheetList = this.dataSPYService.myworkerTimesheetList;
+    this.myworkerTimesheetList = this.dataSPYService.myWorkerTimesheetList;
     this.periodList = this.dataSPYService.periodList;
     this.timesheetList = this.dataSPYService.timesheetList;
   }
@@ -63,7 +63,7 @@ export class TimesheetHomePage extends BasePage implements OnInit {
     await this.showLoadingView({ showOverlay: true });   
     this.apiService.GetMyWorkersTimesheetApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {
       console.log(res);
-      this.dataSPYService.myworkerTimesheetList = res;
+      this.dataSPYService.myWorkerTimesheetList = res;
       this.storageService.setMyWorkerTimesheetList(res);
       this.myworkerTimesheetList = res;
       this.dismissLoadingView(); 
