@@ -29,9 +29,9 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SafariViewController } from '@ionic-native/safari-view-controller/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { OffileInterceptorService } from './services/offile-interceptor.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { OfflineInterceptorService } from './services/offline-interceptor.service';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -75,7 +75,7 @@ export function createTranslateLoader(http: HttpClient) {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     SafariViewController,
     InAppBrowser,
-    { provide: HTTP_INTERCEPTORS, useClass: OffileInterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: OfflineInterceptorService, multi: true }
   ],
   bootstrap: [AppComponent]
 })

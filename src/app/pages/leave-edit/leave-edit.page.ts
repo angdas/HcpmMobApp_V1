@@ -215,7 +215,8 @@ export class LeaveEditPage extends BasePage implements OnInit {
       fileExtension = 'jpeg';
     }     
     let atttachment = {} as LeaveAttachmentModel;
-    imageData = imageData.replace("data:image/png;base64,", "");
+    imageData = imageData.split("base64,")[1];
+    //imageData = imageData.replace("data:image/png;base64,", "");
     atttachment.Attachments = imageData;
     atttachment.DataArea = this.dataSPYService.workerDataArea;
     atttachment.FileExtension = fileExtension;
