@@ -63,8 +63,11 @@ export class LeaveEditPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret: boolean;
     if (this.dataChangeNotSaved) {
-      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
+        if(ret) {
+          this.saveLeave();
+        }
       })
     }
     else ret = true;
@@ -128,6 +131,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
       if (res && this.resupmtion) {
         this.resumptionUpdated = true;
       }
+      this.dataChangeNotSaved = false;
       this.translate.get('LEAVE_SAVED').subscribe(str => this.showAlert(str));
       if (this.pageType == "manager") {
         this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
@@ -150,7 +154,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
     }
     this.camera.getPicture(options).then(async (imageData) => {
       await this.showLoadingView({ showOverlay: true });
-      this.uploadAttachment(imageData);
+      this.uploadAttachment(imageData, 'file.jpeg');
       // imageData is either a base64 encoded string or a file URI
       // If it's base64 (DATA_URL):
       // let base64Image = 'data:image/jpeg;base64,' + imageData;
@@ -186,13 +190,15 @@ export class LeaveEditPage extends BasePage implements OnInit {
   }
 
   getSelectedImg(ev) {
+    var fileName = ev.target.files[0].name;
     this.getBase64(ev.target.files[0]).then(
-      imageData => this.uploadAttachment(imageData)
+      imageData => this.uploadAttachment(imageData, fileName)
     );
   }
+
   getBase64(file) {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+      const reader = new FileReader();      
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = error => reject(error);
@@ -200,15 +206,25 @@ export class LeaveEditPage extends BasePage implements OnInit {
   }
 
 
-  uploadAttachment(imageData) {
+  async uploadAttachment(imageData, fileName) {
+    await this.showLoadingView({ showOverlay: true });
+    var fileExtension: string;
+    if(fileName.indexOf('.') > 0) {
+      fileExtension = fileName.split('.').pop(); 
+    } else {
+      fileExtension = 'jpeg';
+    }     
     let atttachment = {} as LeaveAttachmentModel;
+    imageData = imageData.replace("data:image/png;base64,", "");
     atttachment.Attachments = imageData;
     atttachment.DataArea = this.dataSPYService.workerDataArea;
-    atttachment.FileExtension = "jpeg";
+    atttachment.FileExtension = fileExtension;
     atttachment.TableNumber = this.leaveApp.Number;
     this.apiService.updateLeaveAttachment(atttachment).subscribe(res => {
       console.log(res);
+      this.dismissLoadingView();
     }, error => {
+      console.log(error);
       this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
