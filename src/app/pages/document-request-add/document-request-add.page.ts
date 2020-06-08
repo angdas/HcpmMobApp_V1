@@ -59,8 +59,11 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-      this.alertServ.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertServ.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
+        if(ret) {
+          this.updateDocRequest();
+        }
       })
     }
     else ret = true;
@@ -147,8 +150,9 @@ export class DocumentRequestAddPage extends BasePage implements OnInit {
         this.dataSPYService.documentList = res;
         this.storageService.setDocumentList(res);        
         this.documentList = res;
+        this.dataChangeNotSaved = false;
         this.dismissLoadingView();
-        this.translate.get('HRREQ_SUBMITTED').subscribe(str => this.showAlert(str));
+        this.translate.get('HRREQ_CREATED').subscribe(str => this.showToast(str));
         if (this.pageType == "manager") {
           this.router.navigateByUrl("/tab/tabs/manager-profile/manager_document_request/manager");
         } else {

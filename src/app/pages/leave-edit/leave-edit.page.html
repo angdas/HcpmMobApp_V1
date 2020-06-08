@@ -9,7 +9,7 @@
 
         <ng-template #resume>
             <ion-buttons slot="end">
-                <button class="submitBtn" (click)="saveLeave()">
+                <button class="submitBtn" (click)="updateLeaveDetails()">
                     <ion-icon name="save"></ion-icon>
                 </button>
             </ion-buttons>
@@ -84,7 +84,7 @@
         </ion-item>
     </ion-list>
 
-    <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="saveLeave()">
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="updateLeaveDetails()">
         <ion-fab-button size="small" [disabled]="!editable">
             <ion-icon name="add"></ion-icon>
         </ion-fab-button>

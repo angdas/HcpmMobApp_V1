@@ -63,10 +63,10 @@ export class LeaveEditPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret: boolean;
     if (this.dataChangeNotSaved) {
-      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Are you sure, you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
         if(ret) {
-          this.saveLeave();
+          this.updateLeaveDetails();
         }
       })
     }
@@ -81,10 +81,6 @@ export class LeaveEditPage extends BasePage implements OnInit {
         this.leaveApp.ResumptionInitiated = false;
       }
     }
-  }
-
-  saveLeave() {
-    this.updateLeaveDetails();
   }
 
   async openCalendarForActual(leaveLine: LeaveAppLineContract) {
@@ -132,7 +128,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
         this.resumptionUpdated = true;
       }
       this.dataChangeNotSaved = false;
-      this.translate.get('LEAVE_SAVED').subscribe(str => this.showAlert(str));
+      this.translate.get('LEAVE_UPDATED').subscribe(str => this.showToast(str));
       if (this.pageType == "manager") {
         this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
       } else {
@@ -224,6 +220,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
     this.apiService.updateLeaveAttachment(atttachment).subscribe(res => {
       console.log(res);
       this.dismissLoadingView();
+      this.translate.get('FILE_UPLOADED').subscribe(str => this.showToast(str));
     }, error => {
       console.log(error);
       this.dismissLoadingView();
