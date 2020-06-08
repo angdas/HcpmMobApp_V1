@@ -35,13 +35,16 @@ export class DocumentRequestLinePage extends BasePage implements OnInit {
   onInput(event: any) {
     this.dataChangeNotSaved = true;
   }
-
+  
   @HostListener('window:beforeunload')
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-      this.alertService.AlertConfirmation('Warning', 'Changes was not Updated. Sure you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
+        if(ret) {
+          this.updateDocRequest();
+        }
       })
     }
     else ret = true;
@@ -87,12 +90,13 @@ export class DocumentRequestLinePage extends BasePage implements OnInit {
     //this.sub.unsubscribe();
   }
 
-  async saveDoc() {
+  async updateDocRequest() {
     await this.showLoadingView({ showOverlay: true });   
     this.apiService.updateDocumentRequest(this.documentApp).subscribe(res => {
       console.log(res);
       this.dismissLoadingView(); 
-      this.alertService.AlertMessage("Success", "Document request updated successfully")
+      this.dataChangeNotSaved = false;
+      this.translate.get('HRREQ_UPDATED').subscribe(str => this.showToast(str));
       if (this.pageType == "manager") {
         this.router.navigateByUrl("/tab/tabs/manager-profile/manager_document_request/manager");
       } else {

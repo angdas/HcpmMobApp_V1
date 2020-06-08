@@ -225,11 +225,14 @@
   "WORKER_NOTFOUND": "Worker not found.",
   "WORKER_EMPLOYMENT_NOTFOUND": "Worker employment not found.",
   "LEGAL_ENTITY_CHANGED": "Legal entity is changed.",
+  "HRREQ_CREATED": "HR request is created.",
+  "HRREQ_UPDATED": "HR request is updated.",
   "HRREQ_SUBMITTED": "HR request is submitted.",
   "HRREQ_TYPE_BLANK": "HR request type can't be blank.",
   "HRREQ_ADDRESS_BLANK": "HR address type can't be blank.",
   "HRREQ_EXIST": "HR request already applied for this type",
-  "LEAVE_CREATED": "Leave is created successfully.",
+  "LEAVE_CREATED": "Leave application is created.",
+  "LEAVE_UPDATED": "Leave application is updated.",
   "LEAVE_TYPE_BLANK": "Leave type can't be blank.",
   "LEAVE_SD_BLANK": "Start date can't be blank.",
   "LEAVE_ED_BLANK": "End date can't be blank.",
@@ -251,5 +254,6 @@
   "TS_DELETED": "Timesheet is deleted.",
   "TS_SUBMITTED": "Timesheet is submitted.",
   "TS_APPROVED": "Timesheet is approved.",
-  "TS_REJECTED": "Timesheet is rejected."
+  "TS_REJECTED": "Timesheet is rejected.",
+  "FILE_UPLOADED": "File is uploaded successfully."
 }

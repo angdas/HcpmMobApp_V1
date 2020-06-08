@@ -6,7 +6,7 @@ import { catchError, retry, switchMap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class OffileInterceptorService implements HttpInterceptor {
+export class OfflineInterceptorService implements HttpInterceptor {
 
   get isOnline() {
     return navigator.onLine;
@@ -19,7 +19,7 @@ export class OffileInterceptorService implements HttpInterceptor {
         if (!this.isOnline) {          
           return throwError('OFFLINE');
         } 
-        if(error.status == 404) {
+        if(error.status == 404 || error.statusText == 'Unknown Error') {
           return throwError('ERROR_NETWORK');
         }
         return throwError(error.error);

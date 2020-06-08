@@ -19,8 +19,8 @@ export class LeaveAddPage extends BasePage implements OnInit {
   leaveLine: LeaveAppLineContract = {} as LeaveAppLineContract;
   newLeave: LeaveAppTableContract = {} as LeaveAppTableContract;
   leaveList: LeaveAppTableContract[] = [];
-  sub: any;
-  sub1: any;
+  //sub: any;
+  //sub1: any;
   pageType: any;
   leaveLineAdd: boolean;
   dataChangeNotSaved: boolean = false;
@@ -78,8 +78,11 @@ export class LeaveAddPage extends BasePage implements OnInit {
   isDataSaved(): boolean {
     let ret;
     if (this.dataChangeNotSaved) {
-      this.alertService.AlertConfirmation('Warning', 'Changes is not Updated. Do you want to leave this page?').subscribe(res => {
+      this.alertService.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
+        if(ret) {
+          this.updateLeaveDetails();
+        }
       })
     }
     else ret = true;
@@ -132,9 +135,9 @@ export class LeaveAddPage extends BasePage implements OnInit {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    //this.sub.unsubscribe();
     if (this.leaveLineAdd) {
-      this.sub1.unsubscribe();
+      //this.sub1.unsubscribe();
       this.leaveLine = {} as LeaveAppLineContract;
       this.newLeave = {} as LeaveAppTableContract;
     }
@@ -150,6 +153,7 @@ export class LeaveAddPage extends BasePage implements OnInit {
     this.apiService.updateEmplLeaveAppl(this.newLeave).subscribe(res => {      
       console.log(res);
       if (res.toUpperCase() == "TRUE") {
+        this.dataChangeNotSaved = false;
         if (!this.leaveLineAdd) {
           this.newLeave.IsEditable = true;
           this.leaveList.push(this.newLeave);
@@ -158,18 +162,18 @@ export class LeaveAddPage extends BasePage implements OnInit {
           console.log(res);
           this.dataSPYService.leaveAppList = res;
           this.storageService.setLeaveAppList(res);
-          this.dismissLoadingView();          
+          this.dismissLoadingView(); 
+          this.translate.get('LEAVE_CREATED').subscribe(str => this.showToast(str));
+          this.newLeave = {} as LeaveAppTableContract;   
+          if (this.pageType == "manager") {
+            this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
+          } else {
+            this.router.navigateByUrl("leave-home");
+          }        
         }, error => {
           this.dismissLoadingView(); 
           this.translate.get(error).subscribe(str => this.showToast(str));
-        })
-        this.translate.get('LEAVE_CREATED').subscribe(str => this.showAlert(str));
-        this.newLeave = {} as LeaveAppTableContract;
-        if (this.pageType == "manager") {
-          this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
-        } else {
-          this.router.navigateByUrl("leave-home");
-        }
+        })           
       } else {
         this.dismissLoadingView(); 
         this.showToast(res);

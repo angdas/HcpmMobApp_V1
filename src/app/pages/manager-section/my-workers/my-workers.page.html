@@ -5,21 +5,18 @@
 </ion-header>
 
 <ion-content>
-
   <ion-item detail="true" [routerLink]="['/tab/tabs/my-workers/worker_timesheet_home/worker']">
     <ion-label>
       Timesheet
       <ion-badge color="success"> {{timesheetPending}} </ion-badge>
     </ion-label>
   </ion-item>
-
   <ion-item detail="true" [routerLink]="['/tab/tabs/my-workers/worker_leave_home/worker']">
     <ion-label>
       Leave Application
       <ion-badge color="success"> {{leavePending}} </ion-badge>
     </ion-label>
   </ion-item>
-
   <ion-item detail="true" [routerLink]="['/tab/tabs/my-workers/worker_document_request/worker']">
     <ion-label>
       HR Request
