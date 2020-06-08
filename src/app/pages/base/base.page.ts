@@ -25,21 +25,22 @@ export abstract class BasePage {
   protected translate: TranslateService;
   protected modalCtrl: ModalController;
   protected router: Router;
-  protected activatedRoute: ActivatedRoute;  
+  protected activatedRoute: ActivatedRoute;
   protected storageService: StorageService;
   protected appVersion: AppVersion;
   protected menuCtrl: MenuController;
   protected apiService: ApiService;
   protected alertCtrl: AlertController;
-  
+
   private loadingCtrl: LoadingController;
-  private loader: any;  
+  private loader: any;
   private toastCtrl: ToastController;
   private platform: Platform;
   private title: Title;
   private meta: Meta;
   private safariViewController: SafariViewController;
   private inAppBrowser: InAppBrowser;
+  private statusButtonClass
 
   constructor(injector: Injector) {
     this.translate = injector.get(TranslateService);
@@ -59,6 +60,15 @@ export abstract class BasePage {
     this.appVersion = injector.get(AppVersion);
     this.menuCtrl = injector.get(MenuController);
     this.apiService = injector.get(ApiService);
+
+    this.statusButtonClass = {
+      REJECTED: "color-red",
+      CREATED: "color-blue",
+      STARTED: "color-grey",
+      SUBMITTED: "color-grey",
+      APPROVED: "color-green"
+    }
+
   }
 
   async showLoadingView(params: { showOverlay: boolean }) {
@@ -145,11 +155,11 @@ export abstract class BasePage {
     return this.platform.is('hybrid');
   }
 
-  isCordova(): boolean {    
+  isCordova(): boolean {
     return this.platform.is('cordova');
   }
 
-  isIos(): boolean {    
+  isIos(): boolean {
     return this.platform.is('ios');
   }
 
@@ -280,4 +290,9 @@ export abstract class BasePage {
     return environment.appUrl;
   }
 
+  public getStatusButtonClass(sts) {
+    let status = sts.toUpperCase();
+
+    return this.statusButtonClass[status];
+  }
 }

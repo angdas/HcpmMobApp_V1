@@ -20,9 +20,8 @@
         </ion-fab>
 
         <div class="statusBtn">
-            <!-- [ngClass]="{'color-red': timesheetApp.Status === 'Returned', 'color-blue': timesheetApp.Status === 'Created',
-  'color-green': timesheetApp.Status === 'Approved','color-grey': timesheetApp.Status === 'Started'} " -->
-            <ion-button fill="outline" style="color: white;"
+          
+            <ion-button fill="outline" style="color: white;" [ngClass]="getStatusButtonClass(timesheetApp.Status)"
                 (click)="gotoHeaderPage()">
                 {{timesheetApp.Status}}
             </ion-button>
