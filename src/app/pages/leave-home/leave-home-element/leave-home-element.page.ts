@@ -187,4 +187,8 @@ export class LeaveHomeElementPage extends BasePage implements OnInit {
     this.approvalAlertConfirmation("Reject Leave", "Do you want to reject this leave?", "reject");
   }
 
+  colorRed(){
+    return "color-red";
+  }
+
 }

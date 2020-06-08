@@ -32,10 +32,8 @@
 				</ion-fab-list>
 			</ion-fab>
 		</div>
-
-
-		<ion-button fill="outline" [ngClass]="{'color-red': leaveApp.Status === 'RETURNED', 'color-blue': leaveApp.Status === 'CREATED',
-			'color-green': leaveApp.Status === 'APPROVED','color-grey': leaveApp.Status === 'SUBMITTED'} "
+		
+		<ion-button fill="outline" [ngClass]="getStatusButtonClass(leaveApp.Status)"
 			(click)="gotoLinePage(leaveApp)" *ngIf="!leaveApp.Resumed && !leaveApp.ResumptionInitiated"
 			class="statusBtn">
 			{{leaveApp.Status}}

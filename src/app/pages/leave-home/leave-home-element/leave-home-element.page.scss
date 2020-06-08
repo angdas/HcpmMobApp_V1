@@ -49,33 +49,6 @@ ion-fab-list {
 ion-fab{
     margin-top: -4px;
 }
-.statusBtn {
-    float: right;
-    height: 30px;
-    width: 100px;
-    margin-top: -2px;
-}
-
-.color-red {
-    --border-color: var(--ion-color-danger) !important;
-    color: var(--ion-color-danger) !important;
-}
-
-.color-blue {
-    --border-color: var(--ion-color-primary) !important;
-    color: var(--ion-color-primary) !important;
-}
-
-.color-green {
-    --border-color: var(--ion-color-success) !important;
-    color: var(--ion-color-success) !important;
-}
-
-.color-grey {
-    --border-color: var(--ion-color-medium) !important;
-    color: var(--ion-color-medium) !important;
-}
-
 
 .period {
     color: var(--ion-color-primary);

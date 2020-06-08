@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { DocumentRequestPage } from './document-request.page';
 import { DocumentRequestElementPage } from './document-request-element/document-request-element.page';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 const routes: Routes = [
   {
@@ -17,6 +18,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    Ng2SearchPipeModule,
     CommonModule,
     FormsModule,
     IonicModule,

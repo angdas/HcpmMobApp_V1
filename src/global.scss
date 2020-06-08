@@ -101,3 +101,29 @@ ion-item{
   height: 90%;
   overflow: scroll;
 }
+.statusBtn {
+  float: right;
+  height: 30px;
+  width: 100px;
+  margin-top: -2px;
+}
+
+.color-red {
+  --border-color: var(--ion-color-danger) !important;
+  --background: var(--ion-color-danger) !important;
+}
+
+.color-blue {
+  --border-color: var(--ion-color-primary) !important;
+  --background: var(--ion-color-primary) !important;
+}
+
+.color-green {
+  --border-color: var(--ion-color-success) !important;
+  --background: var(--ion-color-success) !important;
+}
+
+.color-grey {
+  --border-color: var(--ion-color-medium) !important;
+  --background: var(--ion-color-medium) !important;
+}

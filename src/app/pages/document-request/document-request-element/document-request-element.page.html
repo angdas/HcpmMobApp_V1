@@ -20,9 +20,8 @@
       </ion-fab-list>
     </ion-fab>
     <div class="statusBtn">
-      <ion-button fill="outline" [ngClass]="{'color-red': documentReq.Status === 'REJECTED', 'color-blue': documentReq.Status === 'CREATED',
-'color-green': documentReq.Status === 'APPROVED','color-grey': documentReq.Status === 'SUBMITTED'} "
-        (click)="gotoRequestLinePage()">
+      <ion-button fill="outline" [ngClass]="getStatusButtonClass(documentReq.Status)"
+        (click)="gotoRequestLinePage()" class="statusBtn">
         {{documentReq.Status}}
       </ion-button>
     </div>
