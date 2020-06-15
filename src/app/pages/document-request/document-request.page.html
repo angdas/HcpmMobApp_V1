@@ -19,8 +19,8 @@
             <ion-segment-button value="all">
                 <ion-label>All</ion-label>
             </ion-segment-button>
-            <ion-segment-button value="draft">
-                <ion-label>Draft</ion-label>
+            <ion-segment-button value="created">
+                <ion-label>Created</ion-label>
             </ion-segment-button>
             <ion-segment-button value="approved">
                 <ion-label>Approved</ion-label>
@@ -34,37 +34,30 @@
         <div *ngFor="let document of documentList | filter:searchedItem">
             <div [ngSwitch]="selectedTab" style="margin-top: 10px;">
                 <div *ngSwitchCase="'all'">
-                    <document-request-element [documentRequest]="document" [pageType]="pageType">
-                    </document-request-element>
+                    <document-request-element [documentRequest]="document" [pageType]="pageType"></document-request-element>
                 </div>
-
-                <div *ngSwitchCase="'draft'">
-                    <div *ngIf="document.Status=='Created' || document.Status=='Started'">
-                        <document-request-element [documentRequest]="document" [pageType]="pageType">
-                        </document-request-element>
+                <div *ngSwitchCase="'created'">
+                    <div *ngIf="(document.Status | uppercase)=='CREATED'">
+                        <document-request-element [documentRequest]="document" [pageType]="pageType"></document-request-element>
                     </div>
                 </div>
                 <div *ngSwitchCase="'approved'">
-                    <div *ngIf="document.Status=='Approved'">
-                        <document-request-element [documentRequest]="document" [pageType]="pageType">
-                        </document-request-element>
+                    <div *ngIf="(document.Status | uppercase) =='APPROVED'">
+                        <document-request-element [documentRequest]="document" [pageType]="pageType"></document-request-element>
                     </div>
                 </div>
                 <div *ngSwitchCase="'rejected'">
-                    <div *ngIf="document.Status=='Rejected'">
-                        <document-request-element [documentRequest]="document" [pageType]="pageType">
-                        </document-request-element>
+                    <div *ngIf="(document.Status | uppercase) =='REJECTED'">
+                        <document-request-element [documentRequest]="document" [pageType]="pageType"></document-request-element>
                     </div>
                 </div>
             </div>
         </div>
-
         <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addRequest()">
 			<ion-fab-button size="small">
 				<ion-icon name="add"></ion-icon>
 			</ion-fab-button>
-        </ion-fab>
-        
+        </ion-fab>        
     </ng-container>
 
     <ng-template #myWorkers>
