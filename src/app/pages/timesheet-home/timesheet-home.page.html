@@ -4,7 +4,6 @@
 		<ion-buttons slot="start">
 			<ion-back-button></ion-back-button>
 		</ion-buttons>
-
 		<!-- 
 		<ion-buttons slot="end" *ngIf="pageType!='worker'">
 			<button class="addButton" (click)="addTimesheet()">
@@ -20,9 +19,7 @@
 			refreshingSpinner="circles" refreshingText="Refreshing...">
 		</ion-refresher-content>
 	</ion-refresher>
-
 	<div [hidden]="pageType=='worker'">
-
 		<ion-item class="ion-text-wrap itbr" sticky>
 			<ion-select interface="action-sheet" class="ion-text-wrap" placeholder="Period" [(ngModel)]="selectedPeriod"
 				(ionChange)="periodChanged($event)">
@@ -31,7 +28,6 @@
 					{{period.PeriodTo | date:'mediumDate'}}</ion-select-option>
 			</ion-select>
 		</ion-item>
-
 		<ion-segment [(ngModel)]="selectedTab">
 			<ion-segment-button value="all">
 				<ion-label>All</ion-label>
@@ -56,7 +52,6 @@
 						<div *ngSwitchCase="'all'">
 							<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
 						</div>
-
 						<div *ngSwitchCase="'created'">
 							<div *ngIf="(timesheet.Status | uppercase) =='CREATED'">
 								<timesheet-home-element [timesheetApp]="timesheet"></timesheet-home-element>
