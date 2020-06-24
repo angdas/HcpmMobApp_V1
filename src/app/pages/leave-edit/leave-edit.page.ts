@@ -149,7 +149,6 @@ export class LeaveEditPage extends BasePage implements OnInit {
       mediaType: this.camera.MediaType.PICTURE
     }
     this.camera.getPicture(options).then(async (imageData) => {
-      await this.showLoadingView({ showOverlay: true });
       this.uploadAttachment(imageData, 'file.jpeg');
       // imageData is either a base64 encoded string or a file URI
       // If it's base64 (DATA_URL):
