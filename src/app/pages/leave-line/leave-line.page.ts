@@ -48,7 +48,7 @@ export class LeaveLinePage extends BasePage implements OnInit {
   }
 
   addLeaveLine() {
-    //this.dataService.setLeaveLineAddDetails(this.leaveApp);
+    this.dataSPYService.isNewLeaveLine = true;
     this.dataSPYService.leaveApp = this.leaveApp;
     if(this.pageType == 'manager'){
       this.router.navigateByUrl('/tab/tabs/manager-profile/manager_leave_add/manager');

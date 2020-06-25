@@ -28,8 +28,8 @@ export class LeaveAddPage extends BasePage implements OnInit {
   constructor(injector: Injector,
     private activateRoute: ActivatedRoute,
     private alertService: AlertService) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+    super(injector);
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
   async openCalendar() {
@@ -63,8 +63,12 @@ export class LeaveAddPage extends BasePage implements OnInit {
         this.leaveLineAdd = true;
       }
     })*/
-    
+
     this.leaveList = this.dataSPYService.leaveAppList;
+    if (this.dataSPYService.isNewLeaveLine) {
+      this.newLeave = this.dataSPYService.leaveApp;
+      this.leaveLineAdd = true;
+    }
     this.getLeaveType(new Date());
   }
 
@@ -80,7 +84,7 @@ export class LeaveAddPage extends BasePage implements OnInit {
     if (this.dataChangeNotSaved) {
       this.alertService.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
-        if(ret) {
+        if (ret) {
           this.updateLeaveDetails();
         }
       })
@@ -127,7 +131,7 @@ export class LeaveAddPage extends BasePage implements OnInit {
         this.leaveLine.Balance = this.selectedLeaveType.AbsenceDays;
         this.leaveLine.Hours = 0;
 
-        this.newLeave.LeaveApplicationLine.push(this.leaveLine);        
+        this.newLeave.LeaveApplicationLine.push(this.leaveLine);
 
         this.updateLeaveDetails();
       }
@@ -149,8 +153,8 @@ export class LeaveAddPage extends BasePage implements OnInit {
   }
 
   async updateLeaveDetails() {
-    await this.showLoadingView({ showOverlay: true }); 
-    this.apiService.updateEmplLeaveAppl(this.newLeave).subscribe(res => {      
+    await this.showLoadingView({ showOverlay: true });
+    this.apiService.updateEmplLeaveAppl(this.newLeave).subscribe(res => {
       console.log(res);
       if (res.toUpperCase() == "TRUE") {
         this.dataChangeNotSaved = false;
@@ -162,24 +166,24 @@ export class LeaveAddPage extends BasePage implements OnInit {
           console.log(res);
           this.dataSPYService.leaveAppList = res;
           this.storageService.setLeaveAppList(res);
-          this.dismissLoadingView(); 
+          this.dismissLoadingView();
           this.translate.get('LEAVE_CREATED').subscribe(str => this.showToast(str));
-          this.newLeave = {} as LeaveAppTableContract;   
+          this.newLeave = {} as LeaveAppTableContract;
           if (this.pageType == "manager") {
             this.router.navigateByUrl("/tab/tabs/manager-profile/manager_leave_home/manager");
           } else {
             this.router.navigateByUrl("leave-home");
-          }        
+          }
         }, error => {
-          this.dismissLoadingView(); 
+          this.dismissLoadingView();
           this.translate.get(error).subscribe(str => this.showToast(str));
-        })           
+        })
       } else {
-        this.dismissLoadingView(); 
+        this.dismissLoadingView();
         this.showToast(res);
       }
     }, error => {
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
@@ -190,15 +194,15 @@ export class LeaveAddPage extends BasePage implements OnInit {
   }
 
   async getLeaveType(date) {
-    await this.showLoadingView({ showOverlay: true });   
+    await this.showLoadingView({ showOverlay: true });
     this.apiService.getLeaveType(this.dataSPYService.worker.WorkerId, new Date(date)).subscribe(res => {
       console.log(res);
       this.dataSPYService.leaveBalance = res;
       this.storageService.setLeaveBalance(res);
       this.leaveTypeList = res;
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
     }, error => {
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }

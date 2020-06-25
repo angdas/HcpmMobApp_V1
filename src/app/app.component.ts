@@ -40,10 +40,6 @@ export class AppComponent {
     private alertCtrl: AlertController,
     private toastCtrl: ToastController) {
     this.initializeApp();
-
-    this.platform.backButton.subscribeWithPriority(9999, () => {
-      console.log("backbutton")
-    });
   }
 
   initializeApp() {
@@ -57,6 +53,10 @@ export class AppComponent {
       this.statusBar.backgroundColorByHexString('#283679');
     });
     this.checkDarkTheme();
+
+    document.addEventListener("backbutton", function (e) {
+      console.log("disable back button")
+    }, false);
   }
 
   checkDarkTheme() {
