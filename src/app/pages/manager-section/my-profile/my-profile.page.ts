@@ -25,7 +25,7 @@ export class MyProfilePage extends BasePage implements OnInit {
   }
 
   ngOnInit() {
-
+   
   }
   
   ionViewDidEnter() {
@@ -130,6 +130,10 @@ export class MyProfilePage extends BasePage implements OnInit {
     } else {
       this.router.navigateByUrl(whenEmp);
     }
+  }
 
+
+  get Height():boolean{
+     return screen.height >= 640;
   }
 }

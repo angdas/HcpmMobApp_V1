@@ -83,7 +83,7 @@ export class ApiService {
     let url = this.dataSPYService.clientconfig.api + '/api/HCPM/GetWorkerPayslip';
     let body = {
       "WorkerId": user,
-      "PeriodStartDate": period.toLocaleDateString(),
+      "PeriodStartDate": new Date(period),
       "DataArea": this.dataSPYService.workerDataArea
     };
     let httpOptions = {
@@ -255,7 +255,6 @@ export class ApiService {
         'Content-Type': 'Application/json'
       })
     };
-    console.log(JSON.stringify(body))
     return this.http.post(url, body, httpOptions);
   }
 
