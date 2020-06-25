@@ -14,9 +14,9 @@
                 </button>
             </ion-buttons>
         </ng-template>
-
+        <input type="file" style="visibility: hidden;position: fixed;" accept="image/*" #inputFile (change)="getSelectedImg($event)"> 
         <ion-buttons slot="end">
-            <ion-button color="danger" fill="outline" [disabled]="!editable" (click)="selectImage(file)">
+            <ion-button color="danger" fill="outline" [disabled]="!editable" (click)="selectImage(inputFile)">
                 <ion-icon name="attach-outline"></ion-icon>
             </ion-button>
         </ion-buttons>
@@ -25,7 +25,7 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="leaveApp">
     <ion-list *ngFor="let leaveLine of leaveApp.LeaveApplicationLine">
         <ion-list-header>
             <ion-label> {{leaveLine.AbsenceCodeDescription}} </ion-label>
@@ -84,10 +84,9 @@
         </ion-item>
     </ion-list>
 
-    <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="updateLeaveDetails()">
-        <ion-fab-button size="small" [disabled]="!editable">
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed" >
+        <ion-fab-button size="small" [disabled]="!editable" (click)="updateLeaveDetails()">
             <ion-icon name="save"></ion-icon>
         </ion-fab-button>
     </ion-fab>
-    <input type="file" style="visibility: hidden;" accept="image/*" #file (change)="getSelectedImg($event)"> 
 </ion-content>

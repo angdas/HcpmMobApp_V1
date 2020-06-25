@@ -61,7 +61,7 @@
     </ng-container>
 
     <ng-template #myWorkers>
-        <div *ngFor="let documentReq of workerDocumentList">
+        <div *ngFor="let documentReq of workerDocumentList | filter:searchedItem">
             <document-request-element [documentRequest]="documentReq" [pageType]="'worker'"></document-request-element>
         </div>
     </ng-template>

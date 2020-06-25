@@ -28,18 +28,22 @@ export class AppComponent {
 
   constructor(public router: Router,
     private platform: Platform,
-    private splashScreen: SplashScreen, 
-    private storageService: StorageService, 
-    private statusBar: StatusBar, 
+    private splashScreen: SplashScreen,
+    private storageService: StorageService,
+    private statusBar: StatusBar,
     public loadingController: LoadingController,
-    public events: Events, 
-    public axService: AxService, 
+    public events: Events,
+    public axService: AxService,
     public dataService: DataService,
-    private dataSPYService: DataSPYService, 
-    private translate: TranslateService, 
-    private alertCtrl: AlertController, 
+    private dataSPYService: DataSPYService,
+    private translate: TranslateService,
+    private alertCtrl: AlertController,
     private toastCtrl: ToastController) {
-      this.initializeApp();
+    this.initializeApp();
+
+    this.platform.backButton.subscribeWithPriority(9999, () => {
+      console.log("backbutton")
+    });
   }
 
   initializeApp() {
@@ -90,21 +94,21 @@ export class AppComponent {
             } else {
               this.goTo('/myprofile');
             }
-          }          
+          }
         });
         this.storageService.getLeaveBalance().then(resLeaveBalance => {
           this.dataSPYService.leaveBalance = resLeaveBalance;
         })
       } else {
-        this.dataSPYService.isAuthenticated = false;        
+        this.dataSPYService.isAuthenticated = false;
         this.goTo('/settingsspy')
       }
-      
+
       this.storageService.getClientConfiguration().then(resConfig => {
         this.dataSPYService.clientconfig = resConfig;
       });
     });
-    
+
     this.dataSPYService.supportedLangs = environment.supportedLangs;
     this.storageService.getLang().then(res => {
       if (res != null) {
@@ -211,7 +215,7 @@ export class AppComponent {
       this.translate.get('LOGGED_OUT').subscribe(str => this.showToast(str));
     } catch (err) {
       this.dismissLoadingView();
-    }    
+    }
   }
 
   async showToast(message: string) {
