@@ -97,7 +97,6 @@ export class LeaveEditPage extends BasePage implements OnInit {
     myCalendar.onDidDismiss().then((dataReturned) => {
       leaveLine.ActualStartDate = new Date(dataReturned.data.from.dateObj);
       leaveLine.ActualEndDate = new Date(dataReturned.data.to.dateObj);
-      console.log(dataReturned)
     })
   }
 
@@ -115,7 +114,6 @@ export class LeaveEditPage extends BasePage implements OnInit {
     myCalendar.onDidDismiss().then((dataReturned) => {
       leaveLine.StartDate = new Date(dataReturned.data.from.dateObj);
       leaveLine.EndDate = new Date(dataReturned.data.to.dateObj);
-      console.log(dataReturned)
     })
   }
 
@@ -142,17 +140,17 @@ export class LeaveEditPage extends BasePage implements OnInit {
 
   pickImage(sourceType) {
     const options: CameraOptions = {
-      quality: 100,
+      quality: 20,
+      targetWidth: 600,
+      targetHeight: 600,
       sourceType: sourceType,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.PNG,
+      mediaType: this.camera.MediaType.PICTURE,
+      allowEdit: true 
     }
     this.camera.getPicture(options).then(async (imageData) => {
       this.uploadAttachment(imageData, 'file.jpeg');
-      // imageData is either a base64 encoded string or a file URI
-      // If it's base64 (DATA_URL):
-      // let base64Image = 'data:image/jpeg;base64,' + imageData;
     }, (err) => {
     });
   }
@@ -187,7 +185,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
   getSelectedImg(ev) {
     var fileName = ev.target.files[0].name;
     this.getBase64(ev.target.files[0]).then(
-      imageData => this.uploadAttachment(imageData, fileName)
+      (imageData:any) => this.uploadAttachment(imageData.split("base64,")[1], fileName)
     );
   }
 
@@ -210,7 +208,6 @@ export class LeaveEditPage extends BasePage implements OnInit {
       fileExtension = 'jpeg';
     }     
     let atttachment = {} as LeaveAttachmentModel;
-    imageData = imageData.split("base64,")[1];
     //imageData = imageData.replace("data:image/png;base64,", "");
     atttachment.Attachments = imageData;
     atttachment.DataArea = this.dataSPYService.workerDataArea;

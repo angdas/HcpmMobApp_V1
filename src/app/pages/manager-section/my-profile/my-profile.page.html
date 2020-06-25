@@ -12,8 +12,13 @@
         <img [src]="getImageStr()">
       </ion-thumbnail>
     </ion-row>
+    
     <ion-row class="ion-justify-content-center">
       <ion-text color="white" class="text">{{emp.Name}}</ion-text>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center">
+      <ion-icon name="power-outline" *ngIf="!Height" (click)="logout()" style="color: rgba(0, 123, 255, 0.5);"></ion-icon>
     </ion-row>
   </div>
   <ion-grid>
@@ -57,12 +62,12 @@
       </ion-col>
       <ion-col size="4">
         <ion-button class="btn" expand="block"
-        (click)="navigateToPage('/tab/tabs/manager-profile/manager_settings','settingsspy')">
+          (click)="navigateToPage('/tab/tabs/manager-profile/manager_settings','settingsspy')">
           <ion-icon name="notifications" color="light"></ion-icon>
         </ion-button>
         <p class="ion-text-center">Settings</p>
       </ion-col>
     </ion-row>
   </ion-grid>
-  <ion-icon name="power-outline" (click)="logout()" class="logoutBtn"></ion-icon>
+  <ion-icon name="power-outline" *ngIf="Height" (click)="logout()" class="logoutBtn"></ion-icon>
 </ion-content>
