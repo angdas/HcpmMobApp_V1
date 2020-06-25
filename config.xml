@@ -1,11 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<<<<<<< Updated upstream
 <widget id="com.steeples.hcpm" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>HCPM </name>
-=======
-<widget id="com.steeples.hcpm" version="1.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>HCPM</name>
->>>>>>> Stashed changes
     <description>HCPM</description>
     <author email="developer@steeplesystems.com" href="http://steeplesystems.com/">Steeples</author>
     <content src="index.html" />
