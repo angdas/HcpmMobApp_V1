@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Platform, AlertController, ToastController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -13,7 +13,7 @@ import { LoginModel } from './models/login.model';
 import { DataSPYService } from './services/data.spy.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
-
+import { Location } from "@angular/common";
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -38,6 +38,7 @@ export class AppComponent {
     private dataSPYService: DataSPYService,
     private translate: TranslateService,
     private alertCtrl: AlertController,
+    private ngZone: NgZone, private location: Location,
     private toastCtrl: ToastController) {
     this.initializeApp();
   }
@@ -54,11 +55,27 @@ export class AppComponent {
     });
     this.checkDarkTheme();
 
+    let self = this;
     document.addEventListener("backbutton", function (e) {
-      console.log("disable back button")
+      self.ngZone.run(() => {
+        if (self.dataSPYService.worker.IsManager == true) {
+          self.router.navigateByUrl('/tab/tabs/manager-profile', { replaceUrl: true });
+        } else {
+          self.checkUrl(self.router.url);
+        }
+      })
     }, false);
   }
 
+  checkUrl(url){
+    if(url ===  "/leave-home" || url === "/document-request" ){
+      this.router.navigateByUrl('/myprofile', { replaceUrl: true });
+    }else if(url === "/myprofile"){
+
+    }else{
+      this.location.back();
+    }
+  }
   checkDarkTheme() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 

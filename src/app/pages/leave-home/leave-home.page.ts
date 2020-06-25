@@ -1,4 +1,4 @@
-import { Component, OnInit, Injector } from '@angular/core';
+import { Component, OnInit, Injector, NgZone } from '@angular/core';
 import { LeaveAppTableContract } from 'src/app/models/leave/leaveAppTableContact.interface';
 import { ActivatedRoute } from '@angular/router';
 import { BasePage } from '../base/base.page';
@@ -14,14 +14,14 @@ export class LeaveHomePage extends BasePage implements OnInit {
   public leaveAppList: LeaveAppTableContract[];
   authenticated: boolean;
   pageType: any;
-  searchedItem:any;
+  searchedItem: any;
 
   public workerLeaveList: LeaveAppTableContract[];
 
   constructor(injector: Injector,
     private activateRoute: ActivatedRoute) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+    super(injector);
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
   }
 
   ngOnInit() {
@@ -33,15 +33,15 @@ export class LeaveHomePage extends BasePage implements OnInit {
   }
 
   async myWorkersLeave() {
-    await this.showLoadingView({ showOverlay: true });    
-    this.apiService.GetMyWorkersLeaveApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {      
+    await this.showLoadingView({ showOverlay: true });
+    this.apiService.GetMyWorkersLeaveApprovals(this.dataSPYService.worker.WorkerId).subscribe(res => {
       this.dataSPYService.myWorkerLeaveAppList = res;
       this.storageService.setMyWorkerLeaveAppList(res);
       this.workerLeaveList = res;
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       console.log(this.workerLeaveList);
     }, error => {
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }
@@ -52,15 +52,15 @@ export class LeaveHomePage extends BasePage implements OnInit {
   }
 
   async getLeaveDetails() {
-    await this.showLoadingView({ showOverlay: true });    
-    this.apiService.getLeaveDetails(this.dataSPYService.worker.WorkerId).subscribe(res => {      
+    await this.showLoadingView({ showOverlay: true });
+    this.apiService.getLeaveDetails(this.dataSPYService.worker.WorkerId).subscribe(res => {
       this.dataSPYService.leaveAppList = res;
       this.storageService.setLeaveAppList(res);
       this.leaveAppList = res;
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       console.log(res);
     }, error => {
-      this.dismissLoadingView(); 
+      this.dismissLoadingView();
       this.translate.get(error).subscribe(str => this.showToast(str));
     })
   }

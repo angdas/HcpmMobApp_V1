@@ -144,6 +144,7 @@ export class LeaveAddPage extends BasePage implements OnInit {
       //this.sub1.unsubscribe();
       this.leaveLine = {} as LeaveAppLineContract;
       this.newLeave = {} as LeaveAppTableContract;
+      this.dataSPYService.isNewLeaveLine = false;
     }
   }
 
