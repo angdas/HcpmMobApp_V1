@@ -158,9 +158,9 @@ export class LeaveEditPage extends BasePage implements OnInit {
   async selectImage(file) {
     if (this.isCordova()) {
       const actionSheet = await this.actionSheetController.create({
-        header: "Select Image source",
+        header: "Select Image Source",
         buttons: [{
-          text: 'Load from Library',
+          text: 'Load From Library',
           handler: () => {
             this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY);
           }
