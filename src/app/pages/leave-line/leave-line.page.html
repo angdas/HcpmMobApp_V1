@@ -11,25 +11,28 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngFor="let leaveLine of leaveApp.LeaveApplicationLine,let i=index">
-    <div *ngIf="!leaveLine.IsDeleted">
-      <div (click)="editLeaveLine()">
-        <div class="projDetail"
-          [ngStyle]="{'border-left-style': 'solid','border-left-width' : '8px','border-left-color':colorList[i].bgColor }">
-          <p style="margin-top:8px;"> {{leaveLine.StartDate | date:'LL/dd/yy'}} -
-            {{leaveLine.EndDate | date:'LL/dd/yy'}}</p>
-          <p style="margin-top:8px;">{{leaveLine.AbsenceCodeDescription}}</p>
-          <p>Days : {{leaveLine.LeaveApplied | number : '1.2-2' }} </p>
+  <div *ngIf="leaveApp">
+    <ion-list *ngFor="let leaveLine of leaveApp.LeaveApplicationLine,let i=index">
+      <div *ngIf="!leaveLine.IsDeleted">
+        <div (click)="editLeaveLine()">
+          <div class="projDetail"
+            [ngStyle]="{'border-left-style': 'solid','border-left-width' : '8px','border-left-color':colorList[i].bgColor }">
+            <p style="margin-top:8px;"> {{leaveLine.StartDate | date:'LL/dd/yy'}} -
+              {{leaveLine.EndDate | date:'LL/dd/yy'}}</p>
+            <p style="margin-top:8px;">{{leaveLine.AbsenceCodeDescription}}</p>
+            <p>Days : {{leaveLine.LeaveApplied | number : '1.2-2' }} </p>
+          </div>
         </div>
       </div>
-    </div>
-  </ion-list>
+    </ion-list>
 
 
-  <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="addLeaveLine()">
-    <ion-fab-button size="small" [disabled]="!editable">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed">
+      <ion-fab-button size="small" [disabled]="!editable" (click)="addLeaveLine()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+
 
 </ion-content>

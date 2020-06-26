@@ -50,8 +50,8 @@
         </tr>
     </table>
 
-    <ion-fab horizontal="end" vertical="bottom" slot="fixed" (click)="saveTimesheet()">
-        <ion-fab-button size="small" [disabled]="!isEditable">
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed" >
+        <ion-fab-button size="small" [disabled]="!isEditable" (click)="saveTimesheet()">
             <ion-icon name="save"></ion-icon>
         </ion-fab-button>
     </ion-fab>

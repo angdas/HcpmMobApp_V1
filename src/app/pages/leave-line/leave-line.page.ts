@@ -9,22 +9,23 @@ import { BasePage } from '../base/base.page';
   styleUrls: ['./leave-line.page.scss'],
 })
 export class LeaveLinePage extends BasePage implements OnInit {
-  leaveApp:LeaveAppTableContract = {} as LeaveAppTableContract;
-  sub:any;
-  editable:boolean;
-  pageType:any;
+  leaveApp: LeaveAppTableContract = {} as LeaveAppTableContract;
+  sub: any;
+  editable: boolean;
+  pageType: any;
   colorList: any = [];
 
   constructor(injector: Injector,
     private activateRoute: ActivatedRoute) {
-      super(injector);
-      this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
-      this.colorList = this.dataSPYService.colorList;
-     }
+    super(injector);
+    this.pageType = this.activateRoute.snapshot.paramMap.get('pageType');
+    this.colorList = this.dataSPYService.colorList;
+  }
 
   ngOnInit() {
-    this.leaveApp = this.dataSPYService.leaveApp;      
-    this.editable = this.leaveApp.IsEditable;
+    this.leaveApp = this.dataSPYService.leaveApp;
+    if (this.leaveApp)
+      this.editable = this.leaveApp.IsEditable;
     /*
     this.sub = this.dataService.getLeaveLineDetails$.subscribe(res=>{
       this.leaveApp = res;
@@ -32,27 +33,27 @@ export class LeaveLinePage extends BasePage implements OnInit {
       this.editable = this.leaveApp.IsEditable;
     });*/
   }
- 
+
   ngOnDestroy() {
     //this.sub.unsubscribe();
   }
 
-  editLeaveLine() {    
+  editLeaveLine() {
     //this.dataService.setLeaveEditDetails(this.leaveApp);
     this.dataSPYService.leaveApp = this.leaveApp;
-    if(this.pageType=='worker'){
+    if (this.pageType == 'worker') {
       this.router.navigateByUrl('/tab/tabs/my-workers/worker_leave_edit/worker');
-    }else{
+    } else {
       this.router.navigateByUrl('leave-edit');
     }
   }
 
   addLeaveLine() {
-    //this.dataService.setLeaveLineAddDetails(this.leaveApp);
+    this.dataSPYService.isNewLeaveLine = true;
     this.dataSPYService.leaveApp = this.leaveApp;
-    if(this.pageType == 'manager'){
+    if (this.pageType == 'manager') {
       this.router.navigateByUrl('/tab/tabs/manager-profile/manager_leave_add/manager');
-    }else{
+    } else {
       this.router.navigateByUrl("leave-add");
     }
   }

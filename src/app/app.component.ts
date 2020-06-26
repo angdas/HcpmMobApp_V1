@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Platform, AlertController, ToastController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -13,7 +13,7 @@ import { LoginModel } from './models/login.model';
 import { DataSPYService } from './services/data.spy.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
-
+import { Location } from "@angular/common";
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -28,18 +28,19 @@ export class AppComponent {
 
   constructor(public router: Router,
     private platform: Platform,
-    private splashScreen: SplashScreen, 
-    private storageService: StorageService, 
-    private statusBar: StatusBar, 
+    private splashScreen: SplashScreen,
+    private storageService: StorageService,
+    private statusBar: StatusBar,
     public loadingController: LoadingController,
-    public events: Events, 
-    public axService: AxService, 
+    public events: Events,
+    public axService: AxService,
     public dataService: DataService,
-    private dataSPYService: DataSPYService, 
-    private translate: TranslateService, 
-    private alertCtrl: AlertController, 
+    private dataSPYService: DataSPYService,
+    private translate: TranslateService,
+    private alertCtrl: AlertController,
+    private ngZone: NgZone, private location: Location,
     private toastCtrl: ToastController) {
-      this.initializeApp();
+    this.initializeApp();
   }
 
   initializeApp() {
@@ -53,8 +54,28 @@ export class AppComponent {
       this.statusBar.backgroundColorByHexString('#283679');
     });
     this.checkDarkTheme();
+
+    let self = this;
+    document.addEventListener("backbutton", function (e) {
+      self.ngZone.run(() => {
+        if (self.dataSPYService.worker.IsManager == true) {
+          self.router.navigateByUrl('/tab/tabs/manager-profile', { replaceUrl: true });
+        } else {
+          self.checkUrl(self.router.url);
+        }
+      })
+    }, false);
   }
 
+  checkUrl(url){
+    if(url ===  "/leave-home" || url === "/document-request" ){
+      this.router.navigateByUrl('/myprofile', { replaceUrl: true });
+    }else if(url === "/myprofile"){
+
+    }else{
+      this.location.back();
+    }
+  }
   checkDarkTheme() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -90,21 +111,21 @@ export class AppComponent {
             } else {
               this.goTo('/myprofile');
             }
-          }          
+          }
         });
         this.storageService.getLeaveBalance().then(resLeaveBalance => {
           this.dataSPYService.leaveBalance = resLeaveBalance;
         })
       } else {
-        this.dataSPYService.isAuthenticated = false;        
+        this.dataSPYService.isAuthenticated = false;
         this.goTo('/settingsspy')
       }
-      
+
       this.storageService.getClientConfiguration().then(resConfig => {
         this.dataSPYService.clientconfig = resConfig;
       });
     });
-    
+
     this.dataSPYService.supportedLangs = environment.supportedLangs;
     this.storageService.getLang().then(res => {
       if (res != null) {
@@ -211,7 +232,7 @@ export class AppComponent {
       this.translate.get('LOGGED_OUT').subscribe(str => this.showToast(str));
     } catch (err) {
       this.dismissLoadingView();
-    }    
+    }
   }
 
   async showToast(message: string) {

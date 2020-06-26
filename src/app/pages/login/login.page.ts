@@ -87,9 +87,9 @@ export class LoginPage implements OnInit {
         this.paramService.isManager = res.IsManager;
         this.event.publish("isManager", res.IsManager);
         if (res.IsManager) {
-          this.router.navigateByUrl("/tab/tabs/manager-profile");
+          this.router.navigateByUrl("/tab/tabs/manager-profile",{ replaceUrl: true });
         } else {
-          this.router.navigateByUrl("/myprofile")
+          this.router.navigateByUrl("/myprofile",{ replaceUrl: true })
         }
       }
 

@@ -41,6 +41,7 @@ export class DataSPYService {
   public docRequestTypeList: DocumentRequestType[];
   public docReqAddressTypeList: DocumentAddressModel[];
   public colorList: any=[];
+  public isNewLeaveLine:boolean;
 
   public leaveApp: LeaveAppTableContract;
   public documentReq: DocumentRequestModel;

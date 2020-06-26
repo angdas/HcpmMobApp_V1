@@ -36,7 +36,8 @@ export class LeaveEditPage extends BasePage implements OnInit {
 
   ngOnInit() {
     this.leaveApp = this.dataSPYService.leaveApp;
-    this.editable = this.leaveApp.IsEditable;
+    if (this.leaveApp)
+      this.editable = this.leaveApp.IsEditable;
     if (this.leaveApp.Status.toUpperCase() == "APPROVED") {
       this.resupmtion = this.leaveApp.ResumptionInitiated
     }
@@ -65,7 +66,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
     if (this.dataChangeNotSaved) {
       this.alertService.AlertConfirmation('Warning', 'Changes are not Updated. Are you sure, you want to leave this page?').subscribe(res => {
         ret = res;
-        if(ret) {
+        if (ret) {
           this.updateLeaveDetails();
         }
       })
@@ -147,7 +148,7 @@ export class LeaveEditPage extends BasePage implements OnInit {
       destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.PNG,
       mediaType: this.camera.MediaType.PICTURE,
-      allowEdit: true 
+      allowEdit: true
     }
     this.camera.getPicture(options).then(async (imageData) => {
       this.uploadAttachment(imageData, 'file.jpeg');
@@ -185,13 +186,13 @@ export class LeaveEditPage extends BasePage implements OnInit {
   getSelectedImg(ev) {
     var fileName = ev.target.files[0].name;
     this.getBase64(ev.target.files[0]).then(
-      (imageData:any) => this.uploadAttachment(imageData.split("base64,")[1], fileName)
+      (imageData: any) => this.uploadAttachment(imageData.split("base64,")[1], fileName)
     );
   }
 
   getBase64(file) {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();      
+      const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
       reader.onerror = error => reject(error);
@@ -202,11 +203,11 @@ export class LeaveEditPage extends BasePage implements OnInit {
   async uploadAttachment(imageData, fileName) {
     await this.showLoadingView({ showOverlay: true });
     var fileExtension: string;
-    if(fileName.indexOf('.') > 0) {
-      fileExtension = fileName.split('.').pop(); 
+    if (fileName.indexOf('.') > 0) {
+      fileExtension = fileName.split('.').pop();
     } else {
       fileExtension = 'jpeg';
-    }     
+    }
     let atttachment = {} as LeaveAttachmentModel;
     //imageData = imageData.replace("data:image/png;base64,", "");
     atttachment.Attachments = imageData;

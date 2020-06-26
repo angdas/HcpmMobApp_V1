@@ -61,7 +61,7 @@
         </ion-fab-button>
     </ion-fab>
     <ng-template #myWorkers>
-        <div *ngFor="let leave of workerLeaveList">
+        <div *ngFor="let leave of workerLeaveList | filter:searchedItem">
             <leave-home-element [leaveApp]="leave" [pageType]="'worker'"></leave-home-element>
         </div>
     </ng-template>
